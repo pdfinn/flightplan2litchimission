@@ -9,13 +9,14 @@ import (
 	"strconv"
 )
 
+// create a struct to represent the Litchi Mission
 type LitchiMission struct {
 	longitude          float64
 	latitude           float64
 	altitude           float32 // meters
 	heading            float32
 	curvesize          float32
-	rotationdir        bool
+	rotationdir        int8
 	gimblemode         int8
 	gimbalpitchangle   float32
 	actiontype1        int8
@@ -48,7 +49,7 @@ type LitchiMission struct {
 	actionparam14      int8
 	actiontype15       int8
 	actionparam15      int8
-	altitudemode       bool
+	altitudemode       int8
 	speed              float32 // meters per second
 	poi_latitude       float64
 	poi_longitude      float64
@@ -60,7 +61,7 @@ type LitchiMission struct {
 
 // read csv values using csv.Reader
 func readData(rs io.ReadSeeker) ([][]string, error) {
-	// Skip first row (line)
+	// Skip the header row
 	row1, err := bufio.NewReader(rs).ReadSlice('\n')
 	if err != nil {
 		return nil, err
@@ -92,12 +93,64 @@ func main() {
 		panic(err)
 	}
 
-	mission := new(LitchiMission)
+	// create an instance of the mission with default values
+	mission := LitchiMission{
+		longitude:          0,
+		latitude:           0,
+		altitude:           0, // meters
+		heading:            360,
+		curvesize:          0,
+		rotationdir:        0,
+		gimblemode:         0,
+		gimbalpitchangle:   0,
+		actiontype1:        -1,
+		actionparam1:       0,
+		actiontype2:        -1,
+		actionparam2:       0,
+		actiontype3:        -1,
+		actionparam3:       0,
+		actiontype4:        -1,
+		actionparam4:       0,
+		actiontype5:        -1,
+		actionparam5:       0,
+		actiontype6:        -1,
+		actionparam6:       0,
+		actiontype7:        -1,
+		actionparam7:       0,
+		actiontype8:        -1,
+		actionparam8:       0,
+		actiontype9:        -1,
+		actionparam9:       0,
+		actiontype10:       -1,
+		actionparam10:      0,
+		actiontype11:       -1,
+		actionparam11:      0,
+		actiontype12:       -1,
+		actionparam12:      0,
+		actiontype13:       -1,
+		actionparam13:      0,
+		actiontype14:       -1,
+		actionparam14:      0,
+		actiontype15:       -1,
+		actionparam15:      0,
+		altitudemode:       1,
+		speed:              0, // meters per second
+		poi_latitude:       0,
+		poi_longitude:      0,
+		poi_altitude:       0, // meters
+		poi_altitudemode:   0,
+		photo_timeinterval: -1,
+		photo_distinterval: -1,
+	}
 
 	for _, row := range rows {
 		mission.longitude, err = strconv.ParseFloat(row[5], 64)
 		mission.latitude, err = strconv.ParseFloat(row[6], 64)
+		altitude, _ := strconv.ParseFloat(row[3], 32)
+		mission.altitude = float32(altitude)
 	}
 
 	fmt.Println(mission.latitude)
+	fmt.Println(mission.longitude)
+	fmt.Println(mission.altitude)
 }
