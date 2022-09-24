@@ -81,7 +81,7 @@ func readData(rs io.ReadSeeker) ([][]string, error) {
 }
 
 func main() {
-	f, err := os.Open("data.csv")
+	f, err := os.Open("FlightplannerMission.csv")
 	if err != nil {
 		panic(err)
 	}
@@ -143,14 +143,33 @@ func main() {
 		photo_distinterval: -1,
 	}
 
+	//Print the Litchi Mission header
+	fmt.Println("latitude, longitude, altitude(m), heading(deg), curvesize(m), rotationdir, gimbalmode, " +
+		"gimbalpitchangle, actiontype1, actionparam1, actiontype2, actionparam2, actiontype3, actionparam3, " +
+		"actiontype4, actionparam4, actiontype5, actionparam5, actiontype6, actionparam6, actiontype7, " +
+		"actionparam7, actiontype8, actionparam8, actiontype9, actionparam9, actiontype10, actionparam10," +
+		" actiontype11, actionparam11, actiontype12, actionparam12, actiontype13, actionparam13, actiontype14," +
+		" actionparam14, actiontype15, actionparam15, altitudemode, speed(m/s), poi_latitude, poi_longitude, " +
+		"poi_altitude(m), poi_altitudemode, photo_timeinterval, photo_distinterval")
+
 	for _, row := range rows {
 		mission.longitude, err = strconv.ParseFloat(row[5], 64)
 		mission.latitude, err = strconv.ParseFloat(row[6], 64)
 		altitude, _ := strconv.ParseFloat(row[3], 32)
 		mission.altitude = float32(altitude)
+		fmt.Printf("%v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v,%v,%v,%v,%v, %v, %v, %v, %v,%v, %v, "+
+			"%v, %v, %v,%v, %v, %v, %v, %v,%v, %v, %v, %v, %v,%v, %v, %v, %v, %v,%v, %v, %v, %v, %v, %v \n",
+			mission.latitude, mission.latitude, mission.altitude, mission.heading, mission.curvesize,
+			mission.rotationdir, mission.gimblemode, mission.gimbalpitchangle, mission.actiontype1,
+			mission.actionparam1, mission.actiontype2, mission.actionparam2, mission.actiontype3,
+			mission.actionparam3, mission.actiontype4, mission.actionparam4, mission.actiontype5,
+			mission.actionparam5, mission.actiontype6, mission.actionparam6, mission.actiontype7,
+			mission.actionparam7, mission.actiontype8, mission.actionparam8, mission.actiontype9,
+			mission.actionparam9, mission.actiontype10, mission.actionparam10, mission.actiontype11,
+			mission.actionparam11, mission.actiontype12, mission.actionparam12, mission.actiontype13,
+			mission.actionparam13, mission.actiontype14, mission.actionparam14, mission.actiontype15,
+			mission.actionparam15, mission.altitudemode, mission.speed, mission.poi_latitude,
+			mission.poi_longitude, mission.poi_altitude, mission.poi_altitudemode, mission.photo_timeinterval,
+			mission.photo_distinterval)
 	}
-
-	fmt.Println(mission.latitude)
-	fmt.Println(mission.longitude)
-	fmt.Println(mission.altitude)
 }
