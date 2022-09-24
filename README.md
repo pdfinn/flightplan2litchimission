@@ -1,2 +1,2 @@
 # qgis-flightplanner-to-litchi
- A tool for converting QGIS a flightplanner output to a Litchi mission.
+A tool for converting QGIS flightplanner output to a Litchi mission.
