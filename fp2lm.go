@@ -11,8 +11,8 @@ import (
 
 // create a struct to represent the Litchi Mission
 type LitchiMission struct {
-	longitude          float64
 	latitude           float64
+	longitude          float64
 	altitude           float32 // meters
 	heading            float32
 	curvesize          float32
@@ -95,8 +95,8 @@ func main() {
 
 	// create an instance of the mission with default values
 	mission := LitchiMission{
-		longitude:          0,
 		latitude:           0,
+		longitude:          0,
 		altitude:           0, // meters
 		heading:            360,
 		curvesize:          0,
@@ -159,7 +159,7 @@ func main() {
 		mission.altitude = float32(altitude)
 		fmt.Printf("%v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v,%v,%v,%v,%v, %v, %v, %v, %v,%v, %v, "+
 			"%v, %v, %v,%v, %v, %v, %v, %v,%v, %v, %v, %v, %v,%v, %v, %v, %v, %v,%v, %v, %v, %v, %v, %v \n",
-			mission.latitude, mission.latitude, mission.altitude, mission.heading, mission.curvesize,
+			mission.latitude, mission.longitude, mission.altitude, mission.heading, mission.curvesize,
 			mission.rotationdir, mission.gimblemode, mission.gimbalpitchangle, mission.actiontype1,
 			mission.actionparam1, mission.actiontype2, mission.actionparam2, mission.actiontype3,
 			mission.actionparam3, mission.actiontype4, mission.actionparam4, mission.actiontype5,
