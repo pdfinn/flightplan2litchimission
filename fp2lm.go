@@ -81,7 +81,8 @@ func readData(rs io.ReadSeeker) ([][]string, error) {
 }
 
 func main() {
-	f, err := os.Open("FlightplannerMission.csv")
+
+	f, err := os.Open(os.Args[1])
 	if err != nil {
 		panic(err)
 	}
