@@ -59,43 +59,9 @@ type LitchiWaypoint struct {
 	photo_distinterval float32
 }
 
-// read csv values using csv.Reader
-func readData(rs io.ReadSeeker) ([][]string, error) {
-	// Skip the header row
-	row1, err := bufio.NewReader(rs).ReadSlice('\n')
-	if err != nil {
-		return nil, err
-	}
-	_, err = rs.Seek(int64(len(row1)), io.SeekStart)
-	if err != nil {
-		return nil, err
-	}
-
-	// Read remaining rows
-	r := csv.NewReader(rs)
-	rows, err := r.ReadAll()
-	if err != nil {
-		return nil, err
-	}
-	return rows, nil
-}
-
-func main() {
-
-	f, err := os.Open(os.Args[1])
-	if err != nil {
-		panic(err)
-	}
-
-	defer f.Close()
-
-	rows, err := readData(f)
-	if err != nil {
-		panic(err)
-	}
-
-	// create an instance of the waypoint with default values
-	waypoint := LitchiWaypoint{
+// handler function for creating new waypoints
+func createNewWaypoint() LitchiWaypoint {
+	return LitchiWaypoint{
 		latitude:           0,
 		longitude:          0,
 		altitude:           0, // meters
@@ -143,6 +109,50 @@ func main() {
 		photo_timeinterval: -1,
 		photo_distinterval: -1,
 	}
+}
+
+// read csv values using csv.Reader
+func readData(rs io.ReadSeeker) ([][]string, error) {
+	// Skip the header row
+	row1, err := bufio.NewReader(rs).ReadSlice('\n')
+	if err != nil {
+		return nil, err
+	}
+	_, err = rs.Seek(int64(len(row1)), io.SeekStart)
+	if err != nil {
+		return nil, err
+	}
+
+	// Read remaining rows
+	r := csv.NewReader(rs)
+	rows, err := r.ReadAll()
+	if err != nil {
+		return nil, err
+	}
+	return rows, nil
+}
+
+func main() {
+
+	f, err := os.Open(os.Args[1])
+	if err != nil {
+		panic(err)
+	}
+
+	defer func(f *os.File) {
+		err := f.Close()
+		if err != nil {
+			fmt.Println("Usage: fp2lm [flightPlannerWaypoints.csv]")
+		}
+	}(f)
+
+	rows, err := readData(f)
+	if err != nil {
+		panic(err)
+	}
+
+	// create an instance of the waypoint with default values
+	waypoint := createNewWaypoint()
 
 	// print the Litchi Mission header
 	fmt.Println("latitude, longitude, altitude(m), heading(deg), curvesize(m), rotationdir, gimbalmode, " +
