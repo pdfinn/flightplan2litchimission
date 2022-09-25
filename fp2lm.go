@@ -9,8 +9,8 @@ import (
 	"strconv"
 )
 
-// create a struct to represent the Litchi Mission
-type LitchiMission struct {
+// create a struct to represent the Litchi waypoint
+type LitchiWaypoint struct {
 	latitude           float64
 	longitude          float64
 	altitude           float32 // meters
@@ -94,8 +94,8 @@ func main() {
 		panic(err)
 	}
 
-	// create an instance of the mission with default values
-	mission := LitchiMission{
+	// create an instance of the waypoint with default values
+	waypoint := LitchiWaypoint{
 		latitude:           0,
 		longitude:          0,
 		altitude:           0, // meters
@@ -144,7 +144,7 @@ func main() {
 		photo_distinterval: -1,
 	}
 
-	//Print the Litchi Mission header
+	// print the Litchi Mission header
 	fmt.Println("latitude, longitude, altitude(m), heading(deg), curvesize(m), rotationdir, gimbalmode, " +
 		"gimbalpitchangle, actiontype1, actionparam1, actiontype2, actionparam2, actiontype3, actionparam3, " +
 		"actiontype4, actionparam4, actiontype5, actionparam5, actiontype6, actionparam6, actiontype7, " +
@@ -153,24 +153,25 @@ func main() {
 		" actionparam14, actiontype15, actionparam15, altitudemode, speed(m/s), poi_latitude, poi_longitude, " +
 		"poi_altitude(m), poi_altitudemode, photo_timeinterval, photo_distinterval")
 
+	// print the individual records/waypoints
 	for _, row := range rows {
-		mission.longitude, err = strconv.ParseFloat(row[5], 64)
-		mission.latitude, err = strconv.ParseFloat(row[6], 64)
+		waypoint.longitude, err = strconv.ParseFloat(row[5], 64)
+		waypoint.latitude, err = strconv.ParseFloat(row[6], 64)
 		altitude, _ := strconv.ParseFloat(row[3], 32)
-		mission.altitude = float32(altitude)
+		waypoint.altitude = float32(altitude)
 		fmt.Printf("%v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v,%v,%v,%v,%v, %v, %v, %v, %v,%v, %v, "+
 			"%v, %v, %v,%v, %v, %v, %v, %v,%v, %v, %v, %v, %v,%v, %v, %v, %v, %v,%v, %v, %v, %v, %v, %v \n",
-			mission.latitude, mission.longitude, mission.altitude, mission.heading, mission.curvesize,
-			mission.rotationdir, mission.gimblemode, mission.gimbalpitchangle, mission.actiontype1,
-			mission.actionparam1, mission.actiontype2, mission.actionparam2, mission.actiontype3,
-			mission.actionparam3, mission.actiontype4, mission.actionparam4, mission.actiontype5,
-			mission.actionparam5, mission.actiontype6, mission.actionparam6, mission.actiontype7,
-			mission.actionparam7, mission.actiontype8, mission.actionparam8, mission.actiontype9,
-			mission.actionparam9, mission.actiontype10, mission.actionparam10, mission.actiontype11,
-			mission.actionparam11, mission.actiontype12, mission.actionparam12, mission.actiontype13,
-			mission.actionparam13, mission.actiontype14, mission.actionparam14, mission.actiontype15,
-			mission.actionparam15, mission.altitudemode, mission.speed, mission.poi_latitude,
-			mission.poi_longitude, mission.poi_altitude, mission.poi_altitudemode, mission.photo_timeinterval,
-			mission.photo_distinterval)
+			waypoint.latitude, waypoint.longitude, waypoint.altitude, waypoint.heading, waypoint.curvesize,
+			waypoint.rotationdir, waypoint.gimblemode, waypoint.gimbalpitchangle, waypoint.actiontype1,
+			waypoint.actionparam1, waypoint.actiontype2, waypoint.actionparam2, waypoint.actiontype3,
+			waypoint.actionparam3, waypoint.actiontype4, waypoint.actionparam4, waypoint.actiontype5,
+			waypoint.actionparam5, waypoint.actiontype6, waypoint.actionparam6, waypoint.actiontype7,
+			waypoint.actionparam7, waypoint.actiontype8, waypoint.actionparam8, waypoint.actiontype9,
+			waypoint.actionparam9, waypoint.actiontype10, waypoint.actionparam10, waypoint.actiontype11,
+			waypoint.actionparam11, waypoint.actiontype12, waypoint.actionparam12, waypoint.actiontype13,
+			waypoint.actionparam13, waypoint.actiontype14, waypoint.actionparam14, waypoint.actiontype15,
+			waypoint.actionparam15, waypoint.altitudemode, waypoint.speed, waypoint.poi_latitude,
+			waypoint.poi_longitude, waypoint.poi_altitude, waypoint.poi_altitudemode, waypoint.photo_timeinterval,
+			waypoint.photo_distinterval)
 	}
 }
