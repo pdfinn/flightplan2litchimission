@@ -3,4 +3,4 @@
 
 The tool expects a CSV file of waypoints.  Litchi limits missions to 99 waypoints; therefore, for this workflow, waypoints are only used for course changes.  Photograph intervals be set expediently by measuring the distance between projection centres in QGIS, and configuring Litchi to photograph at equal distance intervals.
 
-Usage: `% fp2lm FlightplannerMission.csv > LitchiMission.csv`
+Usage: `% fp2lm [FlightplannerMission].csv > [LitchiMission].csv`
