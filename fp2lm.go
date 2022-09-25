@@ -136,13 +136,14 @@ func main() {
 
 	f, err := os.Open(os.Args[1])
 	if err != nil {
+		//defer fmt.Println("Usage: fp2lm [flightPlannerWaypoints.csv]\n")
 		panic(err)
 	}
 
 	defer func(f *os.File) {
 		err := f.Close()
 		if err != nil {
-			fmt.Println("Usage: fp2lm [flightPlannerWaypoints.csv]")
+			panic(err)
 		}
 	}(f)
 
