@@ -2,12 +2,10 @@ package main
 
 import (
 	"bufio"
-	"encoding/csv"
 	"fmt"
-	"io"
-	"log"
 	"os"
 	"strconv"
+	"strings"
 )
 
 // create a struct to represent the Litchi waypoint
@@ -62,24 +60,6 @@ type LitchiWaypoint struct {
 
 func main() {
 
-	f, err := os.Open(os.Args[1])
-	if err != nil {
-		//defer fmt.Println("Usage: fp2lm [flightPlannerWaypoints.csv]\n")
-		log.Fatal(err)
-	}
-
-	defer func(f *os.File) {
-		err := f.Close()
-		if err != nil {
-			panic(err)
-		}
-	}(f)
-
-	rows, err := readData(f)
-	if err != nil {
-		panic(err)
-	}
-
 	// create an instance of the waypoint with default values
 	waypoint := createNewWaypoint()
 
@@ -92,12 +72,33 @@ func main() {
 		" actionparam14, actiontype15, actionparam15, altitudemode, speed(m/s), poi_latitude, poi_longitude, " +
 		"poi_altitude(m), poi_altitudemode, photo_timeinterval, photo_distinterval")
 
-	// print the individual records/waypoints
-	for _, row := range rows {
-		waypoint.longitude, err = strconv.ParseFloat(row[5], 64)
-		waypoint.latitude, err = strconv.ParseFloat(row[6], 64)
-		altitude, _ := strconv.ParseFloat(row[3], 32)
+	// for each line of standard input, print it as a LitchiMission record
+	scanner := bufio.NewScanner(os.Stdin)
+
+LOOP:
+	for {
+		scanner.Scan()
+		line := scanner.Text()
+
+		// skip the first line
+		if line == "Waypoint Number,X [m],Y [m],Alt. ASL [m],Alt. AGL [m],xcoord,ycoord" {
+			goto LOOP
+		}
+
+		// break on empty line
+		if len(line) == 0 {
+			break
+		}
+
+		// split the line out
+		record := strings.Split(line, ",")
+
+		waypoint.longitude, _ = strconv.ParseFloat(record[5], 64)
+		waypoint.latitude, _ = strconv.ParseFloat(record[6], 64)
+		altitude, _ := strconv.ParseFloat(record[3], 32)
 		waypoint.altitude = float32(altitude)
+
+		// print the individual records/waypoints
 		fmt.Printf("%v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v,%v,%v,%v,%v, %v, %v, %v, %v,%v, %v, "+
 			"%v, %v, %v,%v, %v, %v, %v, %v,%v, %v, %v, %v, %v,%v, %v, %v, %v, %v,%v, %v, %v, %v, %v, %v \n",
 			waypoint.latitude, waypoint.longitude, waypoint.altitude, waypoint.heading, waypoint.curvesize,
@@ -165,25 +166,4 @@ func createNewWaypoint() LitchiWaypoint {
 		photo_timeinterval: -1,
 		photo_distinterval: -1,
 	}
-}
-
-// read csv values using csv.Reader
-func readData(rs io.ReadSeeker) ([][]string, error) {
-	// Skip the header row
-	row1, err := bufio.NewReader(rs).ReadSlice('\n')
-	if err != nil {
-		return nil, err
-	}
-	_, err = rs.Seek(int64(len(row1)), io.SeekStart)
-	if err != nil {
-		return nil, err
-	}
-
-	// Read remaining rows
-	r := csv.NewReader(rs)
-	rows, err := r.ReadAll()
-	if err != nil {
-		return nil, err
-	}
-	return rows, nil
 }
