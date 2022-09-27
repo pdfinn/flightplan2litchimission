@@ -73,26 +73,22 @@ func main() {
 		"poi_altitude(m), poi_altitudemode, photo_timeinterval, photo_distinterval")
 
 	// for each line of standard input, print it as a LitchiMission record
-	scanner := bufio.NewScanner(os.Stdin)
+	input := bufio.NewScanner(os.Stdin)
 
 LOOP:
-	for {
-		scanner.Scan()
-		line := scanner.Text()
+	for input.Scan() != false {
+
+		line := input.Text()
 
 		// skip the first line
 		if line == "Waypoint Number,X [m],Y [m],Alt. ASL [m],Alt. AGL [m],xcoord,ycoord" {
 			goto LOOP
 		}
 
-		// break on empty line
-		if len(line) == 0 {
-			break
-		}
-
 		// split the line out
 		record := strings.Split(line, ",")
 
+		// set the specific waypoint fields
 		waypoint.longitude, _ = strconv.ParseFloat(record[5], 64)
 		waypoint.latitude, _ = strconv.ParseFloat(record[6], 64)
 		altitude, _ := strconv.ParseFloat(record[3], 32)
