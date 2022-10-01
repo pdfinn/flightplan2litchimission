@@ -1,17 +1,22 @@
 package main
 
 import (
+	_ "./distconv"
 	"bufio"
+	"flag"
 	"fmt"
+	"github.com/pdfinn/flightplan2litchimission/distconv"
 	"os"
 	"strconv"
 	"strings"
 )
 
 func main() {
+	flag.Parse()
 
 	// create an instance of the waypoint with default values
 	waypoint := createNewWaypoint()
+	waypoint.photo_distinterval = distconv.PhotoIntervalFlag("distance", 0, "the photo interval distance (meters)")
 
 	// print the Litchi Mission header
 	fmt.Println("latitude, longitude, altitude(m), heading(deg), curvesize(m), rotationdir, gimbalmode, " +
@@ -43,6 +48,7 @@ LOOP:
 		waypoint.latitude, _ = strconv.ParseFloat(record[6], 64)
 		altitude, _ := strconv.ParseFloat(record[3], 32)
 		waypoint.altitude = float32(altitude)
+		waypoint.gimbalpitchangle = -90
 
 		// print the individual records/waypoints
 		fmt.Printf("%v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v,%v,%v,%v,%v, %v, %v, %v, %v,%v, %v, "+
