@@ -22,16 +22,16 @@ func (m Meters) String() string { return fmt.Sprintf("%g", m) }
 type photoIntervalFlag struct{ Meters }
 
 func (f *photoIntervalFlag) Set(s string) error {
-	fmt.Println(f)
-	fmt.Println(s)
 	var unit string
 	var value float64
 	fmt.Sscanf(s, "%f%s", &value, &unit)
 	switch unit {
 	case "M", "m", "Meters", "meters":
 		f.Meters = Meters(value)
+		return nil
 	case "Ft", "ft", "Feet", "feet":
 		f.Meters = feet2meters(Feet(value))
+		return nil
 	}
 	return fmt.Errorf("Invalid units %q", s)
 }
