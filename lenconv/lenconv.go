@@ -1,4 +1,4 @@
-// Package lenconv performs Meters and Feet distance computations.
+// Package lenconv performs meters and feet distance computations.
 package lenconv
 
 import (
@@ -12,7 +12,7 @@ type Feet float64
 func meters2feet(m Meters) Feet { return Feet(m * 3.2808) }
 func feet2meters(f Feet) Meters { return Meters(f * 0.3048) }
 
-func (m Meters) String() string { return fmt.Sprintf("%gM", m) }
+func (m Meters) String() string { return fmt.Sprintf("%g", m) }
 
 //type Value interface {
 //	String() string
@@ -26,7 +26,7 @@ func (f *photoIntervalFlag) Set(s string) error {
 	var value float64
 	fmt.Sscanf(s, "%f%s", &value, &unit)
 	switch unit {
-	case "M", "Meters", "meters":
+	case "M", "m", "Meters", "meters":
 		f.Meters = Meters(value)
 	case "Ft", "ft", "Feet", "feet":
 		f.Meters = feet2meters(Feet(value))
