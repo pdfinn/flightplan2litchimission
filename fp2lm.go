@@ -1,10 +1,10 @@
 package main
 
 import (
+	lenconv "./lenconv"
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/pdfinn/flightplan2litchimission/lenconv"
 	"os"
 	"strconv"
 	"strings"
