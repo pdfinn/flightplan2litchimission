@@ -10,12 +10,14 @@ import (
 	"strings"
 )
 
+var distance = lenconv.PhotoIntervalFlag("distance", 0, "the photo interval distance (meters)")
+
 func main() {
 	flag.Parse()
 
 	// create an instance of the waypoint with default values
 	waypoint := createNewWaypoint()
-	waypoint.photo_distinterval = lenconv.PhotoIntervalFlag("distance", 0, "the photo interval distance (meters)")
+	//waypoint.photo_distinterval = lenconv.PhotoIntervalFlag("distance", 0, "the photo interval distance (meters)")
 
 	// print the Litchi Mission header
 	fmt.Println("latitude, longitude, altitude(m), heading(deg), curvesize(m), rotationdir, gimbalmode, " +
@@ -48,10 +50,11 @@ LOOP:
 		altitude, _ := strconv.ParseFloat(record[3], 32)
 		waypoint.altitude = float32(altitude)
 		waypoint.gimbalpitchangle = -90
+		waypoint.photo_distinterval = distance
 
 		// print the individual records/waypoints
-		fmt.Printf("%v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v,%v,%v,%v,%v, %v, %v, %v, %v,%v, %v, "+
-			"%v, %v, %v,%v, %v, %v, %v, %v,%v, %v, %v, %v, %v,%v, %v, %v, %v, %v,%v, %v, %v, %v, %v, %v \n",
+		fmt.Printf("%v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, "+
+			"%v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v \n",
 			waypoint.latitude, waypoint.longitude, waypoint.altitude, waypoint.heading, waypoint.curvesize,
 			waypoint.rotationdir, waypoint.gimblemode, waypoint.gimbalpitchangle, waypoint.actiontype1,
 			waypoint.actionparam1, waypoint.actiontype2, waypoint.actionparam2, waypoint.actiontype3,
@@ -114,7 +117,7 @@ type LitchiWaypoint struct {
 	poi_altitude       float32 // meters
 	poi_altitudemode   int8
 	photo_timeinterval float32
-	photo_distinterval float32
+	photo_distinterval *lenconv.Meters
 }
 
 // handler function for creating new waypoints
@@ -165,6 +168,6 @@ func createNewWaypoint() LitchiWaypoint {
 		poi_altitude:       0, // meters
 		poi_altitudemode:   0,
 		photo_timeinterval: -1,
-		photo_distinterval: -1,
+		photo_distinterval: distance, // meters
 	}
 }
