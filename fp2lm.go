@@ -10,14 +10,13 @@ import (
 	"strings"
 )
 
-var distance = lenconv.PhotoIntervalFlag("distance", 0, "the photo interval distance (meters)")
+var distance = lenconv.PhotoIntervalFlag("d", 0, "the photo interval distance (meters or feet)")
 
 func main() {
 	flag.Parse()
 
 	// create an instance of the waypoint with default values
 	waypoint := createNewWaypoint()
-	//waypoint.photo_distinterval = lenconv.PhotoIntervalFlag("distance", 0, "the photo interval distance (meters)")
 
 	// print the Litchi Mission header
 	fmt.Println("latitude, longitude, altitude(m), heading(deg), curvesize(m), rotationdir, gimbalmode, " +
