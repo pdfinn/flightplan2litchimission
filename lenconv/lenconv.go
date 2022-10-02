@@ -22,8 +22,6 @@ func (m Meters) String() string { return fmt.Sprintf("%g", m) }
 type photoIntervalFlag struct{ Meters }
 
 func (f *photoIntervalFlag) Set(s string) error {
-	fmt.Println(f)
-	fmt.Println(s)
 	var unit string
 	var value float64
 	fmt.Sscanf(s, "%f%s", &value, &unit)
