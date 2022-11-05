@@ -1,16 +1,16 @@
 package main
 
 import (
-	lenconv "./lenconv"
 	"bufio"
 	"flag"
+	"flightplan2litchimission/lenconv"
 	"fmt"
 	"os"
 	"strconv"
 	"strings"
 )
 
-var distance = lenconv.PhotoIntervalFlag("d", 0, "the photo interval distance (meters or feet)")
+var distance = lenconv.PhotoIntervalFlag("d", 0, "Enter the photo interval distance (meters 'm' or feet 'ft'). Example: -d 20ft")
 
 func main() {
 	flag.Parse()
