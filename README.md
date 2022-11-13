@@ -3,7 +3,7 @@
 
 Usage: `cat [FlightplannerMission].csv | fp2lm [-d] > [LitchiMission].csv`
 
-`-d` sets the distance between projection centres in either meters or feet (feet are automatically convented to meters).  Accepted units are `m`, `ft`, `meters`, and `feet`.
+`-d` sets the distance between projection centres in either meters or feet (feet are automatically converted to meters).  Accepted units are `m`, `ft`, `meters`, and `feet`.
 
 For example, to set the distance between projection centres to 20 meters, use `fp2lm -d 20m`.
 
@@ -36,8 +36,7 @@ Pre-compiled binaries are now available for Mac OS, Linux, and Windows 64-bit ar
 1) Follow the instructions [here](https://learn.microsoft.com/en-us/previous-versions/office/developer/sharepoint-2010/ee537574(v=office.14)) for installing a programme for use by the Windows command line.
 2) Use the operating system's PowerShell application (search 'PowerShell') instead of the DOS command terminal because it is Unix/POSIX-compatible and the command line above (`cat [FlightplannerMission].csv | fp2lm [-d] > [LitchiMission].csv`) will work without modification.  
 
-
-## Building
+## Building from source
 
 `go build fp2lm.go`
 
