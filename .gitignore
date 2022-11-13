@@ -154,5 +154,5 @@ cython_debug/
 # ignore the test file
 FlightplannerMission.csv
 LitchiMissionOriginal.csv
-fp2lm
+./fp2lm
 LitchiMission.csv
