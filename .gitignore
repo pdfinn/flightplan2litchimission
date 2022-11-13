@@ -152,7 +152,7 @@ cython_debug/
 .idea/
 
 # ignore the test file
-#FlightplannerMission.csv
+FlightplannerMission.csv
 LitchiMissionOriginal.csv
 ./fp2lm
 LitchiMission.csv

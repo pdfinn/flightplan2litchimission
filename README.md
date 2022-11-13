@@ -33,7 +33,8 @@ Pre-compiled binaries are now available for Mac OS, Linux, and Windows 64-bit ar
 
 ### Windows
 
-Follow the instructions [here](https://learn.microsoft.com/en-us/previous-versions/office/developer/sharepoint-2010/ee537574(v=office.14)) for installing a programme for use by the Windows command line. 
+1) Follow the instructions [here](https://learn.microsoft.com/en-us/previous-versions/office/developer/sharepoint-2010/ee537574(v=office.14)) for installing a programme for use by the Windows command line.
+2) Use the operating system's PowerShell application (search 'PowerShell') instead of the DOS command terminal because it is Unix/POSIX-compatible and the command line above (`cat [FlightplannerMission].csv | fp2lm [-d] > [LitchiMission].csv`) will work without modification.  
 
 
 ## Building
