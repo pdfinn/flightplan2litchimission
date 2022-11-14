@@ -26,7 +26,7 @@ Pre-compiled binaries are now available for Mac OS, Linux, and Windows 64-bit ar
 ### Linux
 
 1) Create a folder named `bin` in your home directory.  Move the `fp2lm` binary from the download location to the newly-created `bin` directory.
-2) Open the Terminal and update your `PATH` to include the `bin` folder with the following command: `export PATH=/Users/[your home folder]/bin:$PATH`
+2) Open the Terminal and update your `PATH` to include the `bin` folder with the following command: `export PATH=/home/[your home folder]/bin:$PATH`
 3) To make the update to your `PATH` permanent, run the following command: `gedit .profile` (which, on most systems, will open your shell profile in TextEdit) and add the line of code in Step 2 at the end of the file.
 4) Save and close the `.profile` file.
 5) You may now run `fp2lm` from the command line as described above.
