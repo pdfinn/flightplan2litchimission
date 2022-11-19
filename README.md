@@ -21,26 +21,32 @@ Open the Terminal, and copy the commands below.  Change any bracketed `[]` porti
 
 1) Create a folder named `bin` in your home folder:
 
-`mkdir ~/bin`
+
+      mkdir ~/bin
+
 
 2) Move the `fp2lm` binary from the download location to the newly-created `bin` folder:
 
-`mv ~/Downloads/fp2lm ~/bin/fp2lm`
+
+      mv ~/Downloads/fp2lm ~/bin/fp2lm
+
 
 3) Make the `fp2lm` programme executable:
 
-`chmod u+x ~/bin/fp2lm`
+
+      chmod u+x ~/bin/fp2lm
+
 
 4) Open the Terminal and update your `PATH` to include the `bin` folder with the following command:
 
 
-    `export PATH=/Users/[your home folder]/bin:$PATH`
+      export PATH=/Users/[your home folder]/bin:$PATH
 
 
 5) To make the update to your `PATH` permanent, append the updated path to your user profile.
 
 
-    `echo "export PATH=/Users/[your home folder]/bin:$PATH" >> ~/.zshrc`
+      echo "export PATH=/Users/[your home folder]/bin:$PATH" >> ~/.zshrc
 
 
 6) You may now run `fp2lm` from the command line as described above at 'Usage:'
