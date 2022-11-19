@@ -59,11 +59,45 @@ Doing so will create a new file named `LitchiMission.csv` on your desktop, with 
 
 ### Linux
 
-1) Create a folder named `bin` in your home directory.  Move the `fp2lm` binary from the download location to the newly-created `bin` directory.
-2) Open the Terminal and update your `PATH` to include the `bin` folder with the following command: `export PATH=/home/[your home folder]/bin:$PATH`
-3) To make the update to your `PATH` permanent, run the following command: `gedit .profile` (which, on most systems, will open your shell profile in TextEdit) and add the line of code in Step 2 at the end of the file.
-4) Save and close the `.profile` file.
-5) You may now run `fp2lm` from the command line as described above.
+Open the Terminal, and copy the commands below.  Change any bracketed `[]` portions to reflect your particular environment.
+
+1) Create a folder named `bin` in your home folder:
+
+
+      mkdir ~/bin
+
+
+2) Move the `fp2lm` binary from the download location to the newly-created `bin` folder:
+
+
+      mv ~/Downloads/fp2lm ~/bin/fp2lm
+
+
+3) Make the `fp2lm` programme executable:
+
+
+      chmod u+x ~/bin/fp2lm
+
+
+4) Open the Terminal and update your `PATH` to include the `bin` folder with the following command:
+
+
+      export PATH=/home/[your home folder]/bin:$PATH
+
+
+5) To make the update to your `PATH` permanent, append the updated path to your user profile:
+
+
+        echo "export PATH=/home/[your home folder]/bin:$PATH" >> ~/.profile
+
+
+6) You may now run `fp2lm` from the command line as described above at 'Usage:'.  For example, assuming you saved your QGIS Flightplanner flight plan as `FlightplannerMission.csv` on your desktop, and have determined you want twenty-meters between projection centres, you may run the following command:
+
+
+        cat ~/Desktop/FlightplannerMission.csv | fp2lm -d 20m > ~/Desktop/LitchiMission.csv
+
+
+Doing so will create a new file named `LitchiMission.csv` on your desktop, with the distance between projection centres set to twenty-meters, that may be uploaded to Litchi Mission Hub.
 
 ### Windows
 
