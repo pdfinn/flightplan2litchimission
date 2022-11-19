@@ -43,13 +43,19 @@ Open the Terminal, and copy the commands below.  Change any bracketed `[]` porti
       export PATH=/Users/[your home folder]/bin:$PATH
 
 
-5) To make the update to your `PATH` permanent, append the updated path to your user profile.
+5) To make the update to your `PATH` permanent, append the updated path to your user profile:
 
 
-      echo "export PATH=/Users/[your home folder]/bin:$PATH" >> ~/.zshrc
+        echo "export PATH=/Users/[your home folder]/bin:$PATH" >> ~/.zshrc
 
 
-6) You may now run `fp2lm` from the command line as described above at 'Usage:'
+6) You may now run `fp2lm` from the command line as described above at 'Usage:'.  For example, assuming you saved your QGIS Flightplanner flight plan as `FlightplannerMission.csv` on your desktop, and have determined you want twenty-meters between projection centres, you may run the following command:
+
+
+        cat ~/Desktop/FlightplannerMission.csv | fp2lm -d 20m > ~/Desktop/LitchiMission.csv
+
+
+Doing so will create a new file named `LitchiMission.csv` on your desktop, with the distance between projection centres set to twenty-meters, that may be uploaded to Litchi Mission Hub.
 
 ### Linux
 
