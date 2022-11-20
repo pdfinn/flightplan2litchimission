@@ -64,37 +64,37 @@ Open the Terminal, and copy the commands below.  Change any bracketed `[]` porti
 1) Create a folder named `bin` in your home folder:
 
 
-    mkdir ~/bin
+        mkdir ~/bin
 
 
 2) Move the `fp2lm` binary from the download location to the newly-created `bin` folder:
 
 
-    mv ~/Downloads/fp2lm ~/bin/fp2lm
+        mv ~/Downloads/fp2lm ~/bin/fp2lm
 
 
 3) Make the `fp2lm` programme executable:
 
 
-    chmod u+x ~/bin/fp2lm
+        chmod u+x ~/bin/fp2lm
 
 
 4) Open the Terminal and update your `PATH` to include the `bin` folder with the following command:
 
 
-    export PATH=/home/[your home folder]/bin:$PATH
+        export PATH=/home/[your home folder]/bin:$PATH
 
 
 5) To make the update to your `PATH` permanent, append the updated path to your user profile:
 
 
-    echo "export PATH=/home/[your home folder]/bin:$PATH" >> ~/.profile
+        echo "export PATH=/home/[your home folder]/bin:$PATH" >> ~/.profile
 
 
 6) You may now run `fp2lm` from the command line as described above at 'Usage:'.  For example, assuming you saved your QGIS Flightplanner flight plan as `FlightplannerMission.csv` on your desktop, and have determined you want twenty-meters between projection centres, you may run the following command:
 
 
-    cat ~/Desktop/FlightplannerMission.csv | fp2lm -d 20m > ~/Desktop/LitchiMission.csv
+        cat ~/Desktop/FlightplannerMission.csv | fp2lm -d 20m > ~/Desktop/LitchiMission.csv
 
 
 Doing so will create a new file named `LitchiMission.csv` on your desktop, with the distance between projection centres set to twenty-meters, that may be uploaded to Litchi Mission Hub.
@@ -106,19 +106,19 @@ Use the Windows PowerShell application (search 'PowerShell') instead of the DOS 
 1) Create a folder named `bin` in your home folder:
 
 
-    mkdir ~/bin
+        mkdir ~/bin
 
 
 2) Move the `fp2lm.exe` binary from the download location to the newly-created `bin` folder:
 
 
-    mv ~\Downloads\fp2lm.exe ~\bin\fp2lm.exe
+        mv ~\Downloads\fp2lm.exe ~\bin\fp2lm.exe
 
 
 3) You may now run `fp2lm` from the command line as described above at 'Usage:'.  For example, assuming you saved your QGIS Flightplanner flight plan as `FlightplannerMission.csv` on your desktop, and have determined you want twenty-meters between projection centres, you may run the following command:
 
 
-    cat ~\Desktop\FlightplannerMission.csv | fp2lm -d 20m > ~\Desktop\LitchiMission.csv
+        cat ~\Desktop\FlightplannerMission.csv | fp2lm -d 20m > ~\Desktop\LitchiMission.csv
 
 
 Doing so will create a new file named `LitchiMission.csv` on your desktop, with the distance between projection centres set to twenty-meters, that may be uploaded to Litchi Mission Hub.
