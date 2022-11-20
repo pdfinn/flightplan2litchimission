@@ -101,8 +101,32 @@ Doing so will create a new file named `LitchiMission.csv` on your desktop, with 
 
 ### Windows
 
-1) Follow the instructions [here](https://learn.microsoft.com/en-us/previous-versions/office/developer/sharepoint-2010/ee537574(v=office.14)) for installing a programme for use by the Windows command line.
-2) Use the operating system's PowerShell application (search 'PowerShell') instead of the DOS command terminal because it is Unix/POSIX-compatible and the command line above (`cat [FlightplannerMission].csv | fp2lm [-d] > [LitchiMission].csv`) will work without modification.  
+Use the Windows PowerShell application (search 'PowerShell') instead of the DOS command terminal because it is Unix/POSIX-compatible and the example command line above (`cat [FlightplannerMission].csv | fp2lm [-d] > [LitchiMission].csv`) will run without modification.
+
+1) Create a folder named `bin` in your home folder:
+
+
+      mkdir ~/bin
+
+
+2) Move the `fp2lm.exe` binary from the download location to the newly-created `bin` folder:
+
+
+      mv ~\Downloads\fp2lm.exe ~\bin\fp2lm.exe
+
+
+3) You may now run `fp2lm` from the command line as described above at 'Usage:'.  For example, assuming you saved your QGIS Flightplanner flight plan as `FlightplannerMission.csv` on your desktop, and have determined you want twenty-meters between projection centres, you may run the following command:
+
+
+        cat ~\Desktop\FlightplannerMission.csv | fp2lm -d 20m > ~\Desktop\LitchiMission.csv
+
+
+Doing so will create a new file named `LitchiMission.csv` on your desktop, with the distance between projection centres set to twenty-meters, that may be uploaded to Litchi Mission Hub.
+
+
+<!-- 1) Follow the instructions [here](https://learn.microsoft.com/en-us/previous-versions/office/developer/sharepoint-2010/ee537574(v=office.14)) for installing a programme for use by the Windows command line. -->
+
+
 
 ## Building from source
 
