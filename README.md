@@ -3,9 +3,9 @@
 
 Usage: `cat [FlightplannerMission].csv | fp2lm [-d] > [LitchiMission].csv`
 
-`-i` sets the interval (distance) between projection centres in either meters or feet (feet are automatically converted to meters).  Accepted units are `m`, `ft`, `meters`, and `feet`.
+`-d` sets the interval (distance) between projection centres in either meters or feet (feet are automatically converted to meters).  Accepted units are `m`, `ft`, `meters`, and `feet`.
 
-For example, to set the interval between projection centres to 20 meters, use `fp2lm -i 20m`.
+For example, to set the interval between projection centres to 20 meters, use `fp2lm -d 20m`.
 
 ## Description
 
