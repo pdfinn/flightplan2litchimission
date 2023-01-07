@@ -7,6 +7,7 @@ import (
 	"flightplan2litchimission/lenconv"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -55,30 +56,28 @@ func main() {
 			continue
 		}
 
-		// set the specific waypoint fields
-		longitude, err := strconv.ParseFloat(record[5], 64)
+		// set the specific waypoint fields; we use a helper function for validation and check
+		// minimum and maximum values
+		longitude, _, err := parseField(record[5], "float64", -180, 180)
 		if err != nil {
 			fmt.Println("Error parsing longitude:", err)
 			continue
 		}
-
 		waypoint.longitude = longitude
 
-		latitude, err := strconv.ParseFloat(record[6], 64)
+		latitude, _, err := parseField(record[6], "float64", -90, 90)
 		if err != nil {
 			fmt.Println("Error parsing latitude:", err)
 			continue
 		}
-
 		waypoint.latitude = latitude
 
-		altitude, err := strconv.ParseFloat(record[3], 32)
+		altitude, _, err := parseField(record[3], "float64", 0, math.MaxFloat64)
 		if err != nil {
 			fmt.Println("Error parsing altitude:", err)
 			continue
 		}
-
-		waypoint.altitude = float32(altitude)
+		waypoint.altitude = altitude
 		waypoint.gimbalpitchangle = -90
 		waypoint.photo_distinterval = distance
 
@@ -104,7 +103,7 @@ func main() {
 type LitchiWaypoint struct {
 	latitude           float64
 	longitude          float64
-	altitude           float32 // meters
+	altitude           float64 // meters
 	heading            float32
 	curvesize          float32
 	rotationdir        int8
@@ -144,7 +143,7 @@ type LitchiWaypoint struct {
 	speed              float32 // meters per second
 	poi_latitude       float64
 	poi_longitude      float64
-	poi_altitude       float32 // meters
+	poi_altitude       float64 // meters
 	poi_altitudemode   int8
 	photo_timeinterval float32
 	photo_distinterval *lenconv.Meters
@@ -199,5 +198,40 @@ func createNewWaypoint() LitchiWaypoint {
 		poi_altitudemode:   0,
 		photo_timeinterval: -1,
 		photo_distinterval: distance, // meters
+	}
+}
+
+// Helper function to perform validation on the input.  We check for sane types, minimum, and maximum values.
+func parseField(field string, fieldType string, min float64, max float64) (float64, int8, error) {
+	switch fieldType {
+	case "float64":
+		f, err := strconv.ParseFloat(field, 64)
+		if err != nil {
+			return 0, 0, err
+		}
+		if f < min || f > max {
+			return 0, 0, fmt.Errorf("Field value out of range (min: %f, max: %f)", min, max)
+		}
+		return f, 0, nil
+	case "float32":
+		f, err := strconv.ParseFloat(field, 32)
+		if err != nil {
+			return 0, 0, err
+		}
+		if f < min || f > max {
+			return 0, 0, fmt.Errorf("Field value out of range (min: %f, max: %f)", min, max)
+		}
+		return f, 0, nil
+	case "int8":
+		i, err := strconv.ParseInt(field, 10, 32)
+		if err != nil {
+			return 0, 0, err
+		}
+		if i < int64(min) || i > int64(max) {
+			return 0, 0, fmt.Errorf("Field value out of range (min: %f, max: %f)", min, max)
+		}
+		return 0, int8(i), nil
+	default:
+		return 0, 0, fmt.Errorf("Invalid field type: %s", fieldType)
 	}
 }
