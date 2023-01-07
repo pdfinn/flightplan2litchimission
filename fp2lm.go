@@ -2,9 +2,11 @@ package main
 
 import (
 	"bufio"
+	"encoding/csv"
 	"flag"
 	"flightplan2litchimission/lenconv"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -28,20 +30,30 @@ func main() {
 		"poi_altitude(m), poi_altitudemode, photo_timeinterval, photo_distinterval")
 
 	// for each line of standard input, print it as a LitchiMission record
-	input := bufio.NewScanner(os.Stdin)
+	scanner := bufio.NewScanner(os.Stdin)
 
-LOOP:
-	for input.Scan() != false {
+	for scanner.Scan() != false {
+		// Read the next line
+		line := scanner.Text()
 
-		line := input.Text()
+		// Create a new CSV reader to parse the line
+		reader := csv.NewReader(strings.NewReader(line))
 
-		// skip the header, if present
-		if line == "Waypoint Number,X [m],Y [m],Alt. ASL [m],Alt. AGL [m],xcoord,ycoord" {
-			goto LOOP
+		// Read the record from the CSV reader
+		record, err := reader.Read()
+		if err == io.EOF {
+			// End of input, break out of the loop
+			break
+		} else if err != nil {
+			// Other error, print the error and exit
+			fmt.Println("Error reading CSV input:", err)
+			os.Exit(1)
 		}
 
-		// split the line out
-		record := strings.Split(line, ",")
+		// Skip the first record if it matches the expected header
+		if record[0] == "Waypoint Number" && record[1] == "X [m]" && record[2] == "Y [m]" && record[3] == "Alt. ASL [m]" && record[4] == "Alt. AGL [m]" && record[5] == "xcoord" && record[6] == "ycoord" {
+			continue
+		}
 
 		// set the specific waypoint fields
 		longitude, err := strconv.ParseFloat(record[5], 64)
