@@ -44,9 +44,28 @@ LOOP:
 		record := strings.Split(line, ",")
 
 		// set the specific waypoint fields
-		waypoint.longitude, _ = strconv.ParseFloat(record[5], 64)
-		waypoint.latitude, _ = strconv.ParseFloat(record[6], 64)
-		altitude, _ := strconv.ParseFloat(record[3], 32)
+		longitude, err := strconv.ParseFloat(record[5], 64)
+		if err != nil {
+			fmt.Println("Error parsing longitude:", err)
+			continue
+		}
+
+		waypoint.longitude = longitude
+
+		latitude, err := strconv.ParseFloat(record[6], 64)
+		if err != nil {
+			fmt.Println("Error parsing latitude:", err)
+			continue
+		}
+
+		waypoint.latitude = latitude
+
+		altitude, err := strconv.ParseFloat(record[3], 32)
+		if err != nil {
+			fmt.Println("Error parsing altitude:", err)
+			continue
+		}
+
 		waypoint.altitude = float32(altitude)
 		waypoint.gimbalpitchangle = -90
 		waypoint.photo_distinterval = distance
