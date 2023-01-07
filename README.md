@@ -13,7 +13,7 @@ For example, to set the interval between projection centres to 20 meters, use `f
 
 ## Installing
 
-Pre-compiled binaries are now available for Mac OS, Linux, and Windows 64-bit architectures (if you need something else, let me know) and are available in the project's `bin` directory.  Simply install the executable programme `fp2lm` (`fp2lm.exe` on Windows) in a suitable location and make sure its directory is included in your path.
+Pre-compiled binaries are now available for macOS, Linux, and Windows 64-bit architectures (if you need something else, let me know) and are available in the project's `bin` directory.  Simply install the executable programme `fp2lm` (`fp2lm.exe` on Windows) in a suitable location and make sure its directory is included in your path.
 
 ### Mac OS
 
