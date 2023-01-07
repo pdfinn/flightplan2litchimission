@@ -18,8 +18,8 @@ var interval = lenconv.PhotoIntervalFlag("i", 0, "Enter the photo interval (mete
 func main() {
 	flag.Parse()
 
-	// create an instance of the waypoint with default values
-	waypoint := newWaypoint()
+	// create an instance of the wp with default values
+	wp := newWaypoint()
 
 	// print the Litchi Mission header
 	fmt.Println("latitude, longitude, altitude(m), heading(deg), curvesize(m), rotationdir, gimbalmode, " +
@@ -56,46 +56,46 @@ func main() {
 			continue
 		}
 
-		// set the specific waypoint fields; we use a helper function for validation and check
+		// set the specific wp fields; we use a helper function for validation and check
 		// minimum and maximum values
 		longitude, _, err := parseField(rec[5], "float64", -180, 180)
 		if err != nil {
 			fmt.Println("Error parsing longitude:", err)
 			continue
 		}
-		waypoint.longitude = longitude
+		wp.longitude = longitude
 
 		latitude, _, err := parseField(rec[6], "float64", -90, 90)
 		if err != nil {
 			fmt.Println("Error parsing latitude:", err)
 			continue
 		}
-		waypoint.latitude = latitude
+		wp.latitude = latitude
 
 		altitude, _, err := parseField(rec[3], "float64", 0, math.MaxFloat64)
 		if err != nil {
 			fmt.Println("Error parsing altitude:", err)
 			continue
 		}
-		waypoint.altitude = altitude
-		waypoint.gimbalpitchangle = -90
-		waypoint.photo_distinterval = interval
+		wp.altitude = altitude
+		wp.gimbalpitchangle = -90
+		wp.photo_distinterval = interval
 
 		// print the individual records/waypoints
 		fmt.Printf("%v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, "+
 			"%v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v \n",
-			waypoint.latitude, waypoint.longitude, waypoint.altitude, waypoint.heading, waypoint.curvesize,
-			waypoint.rotationdir, waypoint.gimblemode, waypoint.gimbalpitchangle, waypoint.actiontype1,
-			waypoint.actionparam1, waypoint.actiontype2, waypoint.actionparam2, waypoint.actiontype3,
-			waypoint.actionparam3, waypoint.actiontype4, waypoint.actionparam4, waypoint.actiontype5,
-			waypoint.actionparam5, waypoint.actiontype6, waypoint.actionparam6, waypoint.actiontype7,
-			waypoint.actionparam7, waypoint.actiontype8, waypoint.actionparam8, waypoint.actiontype9,
-			waypoint.actionparam9, waypoint.actiontype10, waypoint.actionparam10, waypoint.actiontype11,
-			waypoint.actionparam11, waypoint.actiontype12, waypoint.actionparam12, waypoint.actiontype13,
-			waypoint.actionparam13, waypoint.actiontype14, waypoint.actionparam14, waypoint.actiontype15,
-			waypoint.actionparam15, waypoint.altitudemode, waypoint.speed, waypoint.poi_latitude,
-			waypoint.poi_longitude, waypoint.poi_altitude, waypoint.poi_altitudemode, waypoint.photo_timeinterval,
-			waypoint.photo_distinterval)
+			wp.latitude, wp.longitude, wp.altitude, wp.heading, wp.curvesize,
+			wp.rotationdir, wp.gimblemode, wp.gimbalpitchangle, wp.actiontype1,
+			wp.actionparam1, wp.actiontype2, wp.actionparam2, wp.actiontype3,
+			wp.actionparam3, wp.actiontype4, wp.actionparam4, wp.actiontype5,
+			wp.actionparam5, wp.actiontype6, wp.actionparam6, wp.actiontype7,
+			wp.actionparam7, wp.actiontype8, wp.actionparam8, wp.actiontype9,
+			wp.actionparam9, wp.actiontype10, wp.actionparam10, wp.actiontype11,
+			wp.actionparam11, wp.actiontype12, wp.actionparam12, wp.actiontype13,
+			wp.actionparam13, wp.actiontype14, wp.actionparam14, wp.actiontype15,
+			wp.actionparam15, wp.altitudemode, wp.speed, wp.poi_latitude,
+			wp.poi_longitude, wp.poi_altitude, wp.poi_altitudemode, wp.photo_timeinterval,
+			wp.photo_distinterval)
 	}
 }
 
@@ -150,8 +150,8 @@ type LitchiWaypoint struct {
 }
 
 // handler function for creating new waypoints
-func newWaypoint() LitchiWaypoint {
-	return LitchiWaypoint{
+func newWaypoint() *LitchiWaypoint {
+	return &LitchiWaypoint{
 		latitude:           0,
 		longitude:          0,
 		altitude:           0, // meters
