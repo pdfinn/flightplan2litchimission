@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-var interval = lenconv.PhotoIntervalFlag("i", 0, "Enter the photo interval (meters 'm' or feet 'ft'). Example: -d 20ft")
+var interval = lenconv.PhotoIntervalFlag("i", 0, "Enter the photo interval (meters 'm' or feet 'ft'). Example: -i 20ft")
 
 func main() {
 	flag.Parse()
