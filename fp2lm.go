@@ -13,13 +13,13 @@ import (
 	"strings"
 )
 
-var distance = lenconv.PhotoIntervalFlag("d", 0, "Enter the photo interval distance (meters 'm' or feet 'ft'). Example: -d 20ft")
+var interval = lenconv.PhotoIntervalFlag("i", 0, "Enter the photo interval (meters 'm' or feet 'ft'). Example: -d 20ft")
 
 func main() {
 	flag.Parse()
 
 	// create an instance of the waypoint with default values
-	waypoint := createNewWaypoint()
+	waypoint := newWaypoint()
 
 	// print the Litchi Mission header
 	fmt.Println("latitude, longitude, altitude(m), heading(deg), curvesize(m), rotationdir, gimbalmode, " +
@@ -34,14 +34,14 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for scanner.Scan() != false {
-		// Read the next line
-		line := scanner.Text()
+		// Read the next ln
+		ln := scanner.Text()
 
-		// Create a new CSV reader to parse the line
-		reader := csv.NewReader(strings.NewReader(line))
+		// Create a new CSV reader to parse the ln
+		reader := csv.NewReader(strings.NewReader(ln))
 
-		// Read the record from the CSV reader
-		record, err := reader.Read()
+		// Read the rec from the CSV reader
+		rec, err := reader.Read()
 		if err == io.EOF {
 			// End of input, break out of the loop
 			break
@@ -51,35 +51,35 @@ func main() {
 			os.Exit(1)
 		}
 
-		// Skip the first record if it matches the expected header
-		if record[0] == "Waypoint Number" && record[1] == "X [m]" && record[2] == "Y [m]" && record[3] == "Alt. ASL [m]" && record[4] == "Alt. AGL [m]" && record[5] == "xcoord" && record[6] == "ycoord" {
+		// Skip the first rec if it matches the expected header
+		if rec[0] == "Waypoint Number" && rec[1] == "X [m]" && rec[2] == "Y [m]" && rec[3] == "Alt. ASL [m]" && rec[4] == "Alt. AGL [m]" && rec[5] == "xcoord" && rec[6] == "ycoord" {
 			continue
 		}
 
 		// set the specific waypoint fields; we use a helper function for validation and check
 		// minimum and maximum values
-		longitude, _, err := parseField(record[5], "float64", -180, 180)
+		longitude, _, err := parseField(rec[5], "float64", -180, 180)
 		if err != nil {
 			fmt.Println("Error parsing longitude:", err)
 			continue
 		}
 		waypoint.longitude = longitude
 
-		latitude, _, err := parseField(record[6], "float64", -90, 90)
+		latitude, _, err := parseField(rec[6], "float64", -90, 90)
 		if err != nil {
 			fmt.Println("Error parsing latitude:", err)
 			continue
 		}
 		waypoint.latitude = latitude
 
-		altitude, _, err := parseField(record[3], "float64", 0, math.MaxFloat64)
+		altitude, _, err := parseField(rec[3], "float64", 0, math.MaxFloat64)
 		if err != nil {
 			fmt.Println("Error parsing altitude:", err)
 			continue
 		}
 		waypoint.altitude = altitude
 		waypoint.gimbalpitchangle = -90
-		waypoint.photo_distinterval = distance
+		waypoint.photo_distinterval = interval
 
 		// print the individual records/waypoints
 		fmt.Printf("%v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, "+
@@ -150,7 +150,7 @@ type LitchiWaypoint struct {
 }
 
 // handler function for creating new waypoints
-func createNewWaypoint() LitchiWaypoint {
+func newWaypoint() LitchiWaypoint {
 	return LitchiWaypoint{
 		latitude:           0,
 		longitude:          0,
@@ -197,7 +197,7 @@ func createNewWaypoint() LitchiWaypoint {
 		poi_altitude:       0, // meters
 		poi_altitudemode:   0,
 		photo_timeinterval: -1,
-		photo_distinterval: distance, // meters
+		photo_distinterval: interval, // meters
 	}
 }
 
