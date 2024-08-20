@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/csv"
 	"flag"
-	"flightplan2litchimission/lenconv"
 	"fmt"
 	"io"
 	"math"
@@ -13,93 +12,111 @@ import (
 	"strings"
 )
 
-var interval = lenconv.PhotoIntervalFlag("d", 0, "Enter the photo interval (meters 'm' or feet 'ft'). Example: -d 20ft")
+var interval = flag.Float64("d", 0, "Enter the photo interval (meters). Example: -d 20")
 
 func main() {
 	flag.Parse()
 
+	// Run the core logic and output the result
+	processInput(os.Stdin, os.Stdout)
+}
+
+func processInput(input io.Reader, output io.Writer) {
 	// create an instance of the wp with default values
 	wp := newWaypoint()
 
-	// print the Litchi Mission header
-	fmt.Println("latitude, longitude, altitude(m), heading(deg), curvesize(m), rotationdir, gimbalmode, " +
-		"gimbalpitchangle, actiontype1, actionparam1, actiontype2, actionparam2, actiontype3, actionparam3, " +
-		"actiontype4, actionparam4, actiontype5, actionparam5, actiontype6, actionparam6, actiontype7, " +
-		"actionparam7, actiontype8, actionparam8, actiontype9, actionparam9, actiontype10, actionparam10," +
-		" actiontype11, actionparam11, actiontype12, actionparam12, actiontype13, actionparam13, actiontype14," +
-		" actionparam14, actiontype15, actionparam15, altitudemode, speed(m/s), poi_latitude, poi_longitude, " +
+	// Print the Litchi Mission header
+	fmt.Fprintln(output, "latitude, longitude, altitude(m), heading(deg), curvesize(m), rotationdir, gimbalmode, "+
+		"gimbalpitchangle, actiontype1, actionparam1, actiontype2, actionparam2, actiontype3, actionparam3, "+
+		"actiontype4, actionparam4, actiontype5, actionparam5, actiontype6, actionparam6, actiontype7, "+
+		"actionparam7, actiontype8, actionparam8, actionparam9, actiontype9, actionparam10, actionparam10,"+
+		" actiontype11, actionparam11, actiontype12, actionparam12, actiontype13, actionparam13, actiontype14,"+
+		" actionparam14, actionparam15, actionparam15, altitudemode, speed(m/s), poi_latitude, poi_longitude, "+
 		"poi_altitude(m), poi_altitudemode, photo_timeinterval, photo_distinterval")
 
-	// for each line of standard input, print it as a LitchiMission record
-	scanner := bufio.NewScanner(os.Stdin)
+	// For each line of input, print it as a LitchiMission record
+	scanner := bufio.NewScanner(input)
 
-	for scanner.Scan() != false {
-		// Read the next ln
+	// Skip the first line (header)
+	if scanner.Scan() {
+		_ = scanner.Text() // Read and discard the header line
+	}
+
+	for scanner.Scan() {
 		ln := scanner.Text()
 
-		// Create a new CSV reader to parse the ln
+		// Create a new CSV reader to parse the line
 		reader := csv.NewReader(strings.NewReader(ln))
 
-		// Read the rec from the CSV reader
+		// Read the record from the CSV reader
 		rec, err := reader.Read()
 		if err == io.EOF {
-			// End of input, break out of the loop
 			break
 		} else if err != nil {
-			// Other error, print the error and exit
-			fmt.Println("Error reading CSV input:", err)
-			os.Exit(1)
-		}
-
-		// Skip the first rec if it matches the expected header
-		if rec[0] == "Waypoint Number" && rec[1] == "X [m]" && rec[2] == "Y [m]" && rec[3] == "Alt. ASL [m]" && rec[4] == "Alt. AGL [m]" && rec[5] == "xcoord" && rec[6] == "ycoord" {
+			fmt.Fprintln(output, "Error reading CSV input:", err)
 			continue
 		}
 
-		// set the specific wp fields; we use a helper function for validation and check
-		// minimum and maximum values
-		longitude, _, err := parseField(rec[5], "float64", -180, 180)
+		// Validate the record and set waypoint fields
+		if err := validateRecord(rec); err != nil {
+			fmt.Fprintln(output, "Skipping line due to validation error:", err)
+			continue
+		}
+
+		// Correct mapping: Parse xcoord as longitude and ycoord as latitude
+		wp.longitude, err = parseField(rec[5], -180, 180)
 		if err != nil {
-			fmt.Println("Error parsing longitude:", err)
+			fmt.Fprintln(output, "Skipping line due to error parsing longitude:", err)
 			continue
 		}
-		wp.longitude = longitude
 
-		latitude, _, err := parseField(rec[6], "float64", -90, 90)
+		wp.latitude, err = parseField(rec[6], -90, 90)
 		if err != nil {
-			fmt.Println("Error parsing latitude:", err)
+			fmt.Fprintln(output, "Skipping line due to error parsing latitude:", err)
 			continue
 		}
-		wp.latitude = latitude
 
-		altitude, _, err := parseField(rec[3], "float64", 0, math.MaxFloat64)
+		wp.altitude, err = parseField(rec[3], 0, math.MaxFloat64)
 		if err != nil {
-			fmt.Println("Error parsing altitude:", err)
+			fmt.Fprintln(output, "Skipping line due to error parsing altitude:", err)
 			continue
 		}
-		wp.altitude = altitude
+
+		// Set gimbal pitch angle to -90
 		wp.gimbalpitchangle = -90
-		wp.photo_distinterval = interval
 
-		// print the individual records/waypoints
-		fmt.Printf("%v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, "+
-			"%v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v \n",
+		// Set the photo distance interval
+		wp.photo_distinterval = *interval
+
+		// Print the waypoint
+		fmt.Fprintf(output, "%v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, "+
+			"%v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v, %v\n",
 			wp.latitude, wp.longitude, wp.altitude, wp.heading, wp.curvesize,
 			wp.rotationdir, wp.gimblemode, wp.gimbalpitchangle, wp.actiontype1,
 			wp.actionparam1, wp.actiontype2, wp.actionparam2, wp.actiontype3,
-			wp.actionparam3, wp.actiontype4, wp.actionparam4, wp.actiontype5,
-			wp.actionparam5, wp.actiontype6, wp.actionparam6, wp.actiontype7,
-			wp.actionparam7, wp.actiontype8, wp.actionparam8, wp.actiontype9,
-			wp.actionparam9, wp.actiontype10, wp.actionparam10, wp.actiontype11,
-			wp.actionparam11, wp.actiontype12, wp.actionparam12, wp.actiontype13,
-			wp.actionparam13, wp.actiontype14, wp.actionparam14, wp.actiontype15,
-			wp.actionparam15, wp.altitudemode, wp.speed, wp.poi_latitude,
+			wp.actionparam3, wp.actionparam4, wp.actionparam4, wp.actionparam5,
+			wp.actionparam5, wp.actionparam6, wp.actionparam6, wp.actionparam7,
+			wp.actionparam7, wp.actionparam8, wp.actionparam8, wp.actionparam9,
+			wp.actionparam9, wp.actionparam10, wp.actionparam10, wp.actionparam11,
+			wp.actionparam11, wp.actionparam12, wp.actionparam12, wp.actionparam13,
+			wp.actionparam13, wp.actionparam14, wp.actionparam14, wp.actionparam15,
+			wp.altitudemode, wp.speed, wp.poi_latitude,
 			wp.poi_longitude, wp.poi_altitude, wp.poi_altitudemode, wp.photo_timeinterval,
 			wp.photo_distinterval)
 	}
 }
 
-// LitchiWaypoint is a struct to represent the Litchi waypoint
+func parseField(field string, min, max float64) (float64, error) {
+	f, err := strconv.ParseFloat(field, 64)
+	if err != nil {
+		return 0, err
+	}
+	if f < min || f > max {
+		return 0, fmt.Errorf("Field value out of range (min: %f, max: %f)", min, max)
+	}
+	return f, nil
+}
+
 type LitchiWaypoint struct {
 	latitude           float64
 	longitude          float64
@@ -146,7 +163,7 @@ type LitchiWaypoint struct {
 	poi_altitude       float64 // meters
 	poi_altitudemode   int8
 	photo_timeinterval float32
-	photo_distinterval *lenconv.Meters
+	photo_distinterval float64
 }
 
 // handler function for creating new waypoints
@@ -159,7 +176,7 @@ func newWaypoint() *LitchiWaypoint {
 		curvesize:          0,
 		rotationdir:        0,
 		gimblemode:         0,
-		gimbalpitchangle:   0,
+		gimbalpitchangle:   -90,
 		actiontype1:        -1,
 		actionparam1:       0,
 		actiontype2:        -1,
@@ -197,41 +214,13 @@ func newWaypoint() *LitchiWaypoint {
 		poi_altitude:       0, // meters
 		poi_altitudemode:   0,
 		photo_timeinterval: -1,
-		photo_distinterval: interval, // meters
+		photo_distinterval: *interval, // meters
 	}
 }
 
-// Helper function to perform validation on the input.  We check for sane types, minimum, and maximum values.
-func parseField(field string, fieldType string, min float64, max float64) (float64, int8, error) {
-	switch fieldType {
-	case "float64":
-		f, err := strconv.ParseFloat(field, 64)
-		if err != nil {
-			return 0, 0, err
-		}
-		if f < min || f > max {
-			return 0, 0, fmt.Errorf("Field value out of range (min: %f, max: %f)", min, max)
-		}
-		return f, 0, nil
-	case "float32":
-		f, err := strconv.ParseFloat(field, 32)
-		if err != nil {
-			return 0, 0, err
-		}
-		if f < min || f > max {
-			return 0, 0, fmt.Errorf("Field value out of range (min: %f, max: %f)", min, max)
-		}
-		return f, 0, nil
-	case "int8":
-		i, err := strconv.ParseInt(field, 10, 32)
-		if err != nil {
-			return 0, 0, err
-		}
-		if i < int64(min) || i > int64(max) {
-			return 0, 0, fmt.Errorf("Field value out of range (min: %f, max: %f)", min, max)
-		}
-		return 0, int8(i), nil
-	default:
-		return 0, 0, fmt.Errorf("Invalid field type: %s", fieldType)
+func validateRecord(rec []string) error {
+	if len(rec) < 7 { // Assuming at least 7 fields are needed
+		return fmt.Errorf("record has too few fields")
 	}
+	return nil
 }
