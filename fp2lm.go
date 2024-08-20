@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/csv"
 	"flag"
+	"flightplan2litchimission/lenconv"
 	"fmt"
 	"io"
 	"math"
@@ -12,7 +13,19 @@ import (
 	"strings"
 )
 
-var interval = flag.Float64("d", 0, "Enter the photo interval (meters). Example: -d 20")
+var interval = lenconv.PhotoIntervalFlag("d", 0, "Enter the photo interval (meters 'm' or feet 'ft'). Example: -d 20ft")
+
+func calculateBearing(lat1, lon1, lat2, lon2 float64) float64 {
+	lat1Rad := lat1 * math.Pi / 180
+	lat2Rad := lat2 * math.Pi / 180
+	lonDiffRad := (lon2 - lon1) * math.Pi / 180
+
+	y := math.Sin(lonDiffRad) * math.Cos(lat2Rad)
+	x := math.Cos(lat1Rad)*math.Sin(lat2Rad) - math.Sin(lat1Rad)*math.Cos(lat2Rad)*math.Cos(lonDiffRad)
+	bearing := math.Atan2(y, x) * 180 / math.Pi
+
+	return math.Mod(bearing+360, 360)
+}
 
 func main() {
 	flag.Parse()
@@ -29,7 +42,7 @@ func processInput(input io.Reader, output io.Writer) {
 	fmt.Fprintln(output, "latitude, longitude, altitude(m), heading(deg), curvesize(m), rotationdir, gimbalmode, "+
 		"gimbalpitchangle, actiontype1, actionparam1, actiontype2, actionparam2, actiontype3, actionparam3, "+
 		"actiontype4, actionparam4, actiontype5, actionparam5, actiontype6, actionparam6, actiontype7, "+
-		"actionparam7, actiontype8, actionparam8, actionparam9, actiontype9, actionparam10, actionparam10,"+
+		"actionparam7, actiontype8, actionparam8, actiontype9, actionparam9, actionparam10, actiontype10,"+
 		" actiontype11, actionparam11, actiontype12, actionparam12, actiontype13, actionparam13, actiontype14,"+
 		" actionparam14, actionparam15, actionparam15, altitudemode, speed(m/s), poi_latitude, poi_longitude, "+
 		"poi_altitude(m), poi_altitudemode, photo_timeinterval, photo_distinterval")
@@ -64,19 +77,19 @@ func processInput(input io.Reader, output io.Writer) {
 		}
 
 		// Correct mapping: Parse xcoord as longitude and ycoord as latitude
-		wp.longitude, err = parseField(rec[5], -180, 180)
+		wp.longitude, _, err = parseField(rec[5], "float64", -180, 180)
 		if err != nil {
 			fmt.Fprintln(output, "Skipping line due to error parsing longitude:", err)
 			continue
 		}
 
-		wp.latitude, err = parseField(rec[6], -90, 90)
+		wp.latitude, _, err = parseField(rec[6], "float64", -90, 90)
 		if err != nil {
 			fmt.Fprintln(output, "Skipping line due to error parsing latitude:", err)
 			continue
 		}
 
-		wp.altitude, err = parseField(rec[3], 0, math.MaxFloat64)
+		wp.altitude, _, err = parseField(rec[3], "float64", 0, math.MaxFloat64)
 		if err != nil {
 			fmt.Fprintln(output, "Skipping line due to error parsing altitude:", err)
 			continue
@@ -106,17 +119,7 @@ func processInput(input io.Reader, output io.Writer) {
 	}
 }
 
-func parseField(field string, min, max float64) (float64, error) {
-	f, err := strconv.ParseFloat(field, 64)
-	if err != nil {
-		return 0, err
-	}
-	if f < min || f > max {
-		return 0, fmt.Errorf("Field value out of range (min: %f, max: %f)", min, max)
-	}
-	return f, nil
-}
-
+// LitchiWaypoint is a struct to represent the Litchi waypoint
 type LitchiWaypoint struct {
 	latitude           float64
 	longitude          float64
@@ -163,7 +166,7 @@ type LitchiWaypoint struct {
 	poi_altitude       float64 // meters
 	poi_altitudemode   int8
 	photo_timeinterval float32
-	photo_distinterval float64
+	photo_distinterval lenconv.Meters
 }
 
 // handler function for creating new waypoints
@@ -218,9 +221,45 @@ func newWaypoint() *LitchiWaypoint {
 	}
 }
 
+// Helper function to perform validation on the input. We check for sane types, minimum, and maximum values.
+func parseField(field string, fieldType string, min float64, max float64) (float64, int8, error) {
+	switch fieldType {
+	case "float64":
+		f, err := strconv.ParseFloat(field, 64)
+		if err != nil {
+			return 0, 0, err
+		}
+		if f < min || f > max {
+			return 0, 0, fmt.Errorf("Field value out of range (min: %f, max: %f)", min, max)
+		}
+		return f, 0, nil
+	case "float32":
+		f, err := strconv.ParseFloat(field, 32)
+		if err != nil {
+			return 0, 0, err
+		}
+		if f < min || f > max {
+			return 0, 0, fmt.Errorf("Field value out of range (min: %f, max: %f)", min, max)
+		}
+		return f, 0, nil
+	case "int8":
+		i, err := strconv.ParseInt(field, 10, 32)
+		if err != nil {
+			return 0, 0, err
+		}
+		if i < int64(min) || i > int64(max) {
+			return 0, 0, fmt.Errorf("Field value out of range (min: %f, max: %f)", min, max)
+		}
+		return 0, int8(i), nil
+	default:
+		return 0, 0, fmt.Errorf("Invalid field type: %s", fieldType)
+	}
+}
+
+// Validation function to ensure the record has enough fields
 func validateRecord(rec []string) error {
-	if len(rec) < 7 { // Assuming at least 7 fields are needed
-		return fmt.Errorf("record has too few fields")
+	if len(rec) < 7 { // Ensure there are enough fields in the record
+		return fmt.Errorf("Record has too few fields")
 	}
 	return nil
 }
