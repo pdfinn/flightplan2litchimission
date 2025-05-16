@@ -19,9 +19,17 @@ jobs:
         with:
           go-version: "1.22"
           
-      - name: Initialize dependencies
+      - name: Force create go.sum
         run: |
+          # Add a temporary dependency to force go.sum creation
+          go get github.com/stretchr/testify
           go mod tidy
+          
+      - name: Show go module files (debug)
+        run: |
+          ls -la
+          cat go.mod || echo "go.mod not found"
+          cat go.sum || echo "go.sum not found"
 
       - name: Set VERSION from git tag
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
