@@ -1,0 +1,30 @@
+name: debug-release
+
+on:
+  workflow_dispatch:  # This allows manual triggering from the GitHub UI
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: "1.22"
+          
+      - name: Setup tmate debug session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+          
+      # This step won't execute until you exit the tmate session
+      - name: Manual goreleaser run
+        run: |
+          go install github.com/goreleaser/goreleaser@latest
+          goreleaser build --snapshot --clean
+          ls -la dist/ 

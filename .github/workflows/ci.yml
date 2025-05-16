@@ -1,0 +1,141 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+        check-latest: true
+
+    - name: Verify dependencies
+      run: go mod verify
+
+    - name: Run all checks (via Makefile)
+      run: make check
+
+    - name: Test Golden Files
+      run: |
+        mkdir -p testdata
+        cp fp2lm/testdata/litchi_golden.csv testdata/litchi_golden_original.csv
+        go run cmd/fp2lm/main.go < fp2lm/testdata/FlightplannerMission.csv > testdata/litchi_generated.csv
+        if ! diff -u fp2lm/testdata/litchi_golden.csv testdata/litchi_generated.csv; then
+          echo "Golden file does not match generated output"
+          exit 1
+        fi
+
+    - name: Test flag-driven behavior
+      run: |
+        # Test with ASL altitude mode
+        go run cmd/fp2lm/main.go -altitude-mode=asl < fp2lm/testdata/FlightplannerMission.csv > testdata/asl_output.csv
+        grep -q 'altitudemode,0,' testdata/asl_output.csv || (echo "ASL mode failed" && exit 1)
+        
+        # Test with different pitch
+        go run cmd/fp2lm/main.go -pitch=-80 < fp2lm/testdata/FlightplannerMission.csv > testdata/pitch_output.csv
+        grep -q 'gimbalpitchangle,-80.0,' testdata/pitch_output.csv || (echo "Pitch setting failed" && exit 1)
+        
+        # Test with interval
+        go run cmd/fp2lm/main.go -d 10m < fp2lm/testdata/FlightplannerMission.csv > testdata/interval_output.csv
+        grep -q 'photo_distinterval,10.0,' testdata/interval_output.csv || (echo "Interval setting failed" && exit 1)
+        
+        # Test with max altitude guard
+        go run cmd/fp2lm/main.go -max-altitude=50 < fp2lm/testdata/FlightplannerMission.csv > testdata/altitude_output.csv
+        ! grep -q 'altitude.*100' testdata/altitude_output.csv || (echo "Altitude limit failed" && exit 1)
+        
+        # Test with output file
+        go run cmd/fp2lm/main.go -output=testdata/output_file.csv < fp2lm/testdata/FlightplannerMission.csv
+        [ -f testdata/output_file.csv ] || (echo "Output file not created" && exit 1)
+        
+    - name: Test CSV round-trip conversion
+      run: |
+        # Generate a Litchi CSV with AGL mode
+        go run cmd/fp2lm/main.go < fp2lm/testdata/FlightplannerMission.csv > testdata/first_pass.csv
+        
+        # Feed that CSV back in with ASL mode
+        go run cmd/fp2lm/main.go -altitude-mode=asl < testdata/first_pass.csv > testdata/second_pass.csv
+        
+        # Create a verification script
+        cat > verify.py << 'EOF'
+        #!/usr/bin/env python3
+        import csv
+        import sys
+        import math
+        
+        def read_coords(file):
+            data = []
+            with open(file, 'r') as f:
+                reader = csv.reader(f)
+                next(reader)  # Skip header
+                for row in reader:
+                    if len(row) >= 3:
+                        data.append([float(row[0]), float(row[1]), float(row[2])])
+            return data
+        
+        first = read_coords('testdata/first_pass.csv')
+        second = read_coords('testdata/second_pass.csv')
+        
+        if len(first) != len(second):
+            print(f'Waypoint count mismatch: {len(first)} vs {len(second)}')
+            sys.exit(1)
+        
+        for i, (f, s) in enumerate(zip(first, second)):
+            for j in range(3):
+                if abs(f[j] - s[j]) > 0.0001:
+                    print(f'Waypoint {i}, coordinate {j}: {f[j]} vs {s[j]}')
+                    sys.exit(1)
+        
+        print('Round-trip test passed')
+        EOF
+        
+        chmod +x verify.py
+        ./verify.py
+
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+        check-latest: true
+
+    - name: Build release artifacts
+      run: make release
+
+    - name: Upload Linux artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: fp2lm-linux-amd64
+        path: dist/fp2lm-linux-amd64.tar.gz
+
+    - name: Upload macOS Intel artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: fp2lm-darwin-amd64
+        path: dist/fp2lm-darwin-amd64.tar.gz
+
+    - name: Upload macOS ARM artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: fp2lm-darwin-arm64
+        path: dist/fp2lm-darwin-arm64.tar.gz
+
+    - name: Upload Windows artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: fp2lm-windows-amd64
+        path: dist/fp2lm-windows-amd64.zip 
