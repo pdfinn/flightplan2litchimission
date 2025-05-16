@@ -156,3 +156,45 @@ FlightplannerMission.csv
 LitchiMissionOriginal.csv
 ./fp2lm
 LitchiMission.csv
+
+# Binary files
+*.bin
+bin/
+dist/
+fp2lm
+main
+fp2lm.exe
+**/fp2lm
+
+# Ignore binary files in any directory
+*.exe
+*.dll
+*.so
+*.dylib
+*.out
+
+# Compiled binaries for any platform
+**/bin/
+
+# Binaries for programs and plugins
+# (Go standard .gitignore entries)
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Output of the go coverage tool
+*.cover
+coverage.txt
+profile.out
+
+# Go workspace file
+go.work
+
+# Test output files
+TestOutput.csv
+TestFixed.csv
+TestFixedASL.csv
+FinalTest.csv
+*_output.csv
