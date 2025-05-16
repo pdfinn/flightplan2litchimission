@@ -17,6 +17,10 @@ jobs:
         with:
           go-version: "1.22"
           
+      - name: Initialize dependencies
+        run: |
+          go mod tidy
+          
       - name: Setup tmate debug session
         uses: mxschmitt/action-tmate@v3
         with:

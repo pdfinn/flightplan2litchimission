@@ -18,6 +18,10 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: "1.22"
+          
+      - name: Initialize dependencies
+        run: |
+          go mod tidy
 
       - name: Set VERSION from git tag
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
