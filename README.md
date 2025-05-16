@@ -56,11 +56,36 @@ make check
 
 ### Pre-compiled binaries
 
-Pre-compiled binaries are available as GitHub Actions artifacts for the latest successful build on the main branch. You can download them from the Actions tab of the repository.
+Pre-compiled binaries for Windows, macOS, and Linux are available from the [Releases page](https://github.com/pdfinn/flightplan2litchimission/releases). Simply download the appropriate package for your operating system.
+
+- **Windows**: Download `fp2lm_windows_amd64.zip`
+- **macOS (Intel)**: Download `fp2lm_darwin_amd64.tar.gz`
+- **macOS (Apple Silicon)**: Download `fp2lm_darwin_arm64.tar.gz`
+- **Linux (x86_64)**: Download `fp2lm_linux_amd64.tar.gz`
+- **Linux (ARM64)**: Download `fp2lm_linux_arm64.tar.gz`
 
 Alternatively, you can build from source by following the instructions below.
 
 ### Mac OS
+
+#### Quick Start (using pre-compiled binary)
+
+1. Download the appropriate package for your Mac from the [Releases page](https://github.com/pdfinn/flightplan2litchimission/releases):
+   - For Intel Macs: `fp2lm_darwin_amd64.tar.gz`
+   - For Apple Silicon Macs: `fp2lm_darwin_arm64.tar.gz`
+
+2. Extract the archive:
+   ```
+   tar -xzf ~/Downloads/fp2lm_darwin_*.tar.gz
+   ```
+
+3. Make the binary executable and run it directly:
+   ```
+   chmod +x ./fp2lm
+   ./fp2lm -d 20m < FlightplannerMission.csv > LitchiMission.csv
+   ```
+
+#### Advanced Setup (adding to PATH)
 
 Open the Terminal, and copy the commands below. Change any bracketed `[]` portions to reflect your particular environment.
 
@@ -73,7 +98,7 @@ mkdir ~/bin
 2. Move the `fp2lm` binary from the download location to the newly-created `bin` folder:
 
 ```
-mv ~/Downloads/fp2lm ~/bin/fp2lm
+mv ~/Downloads/fp2lm_darwin_*/fp2lm ~/bin/fp2lm
 ```
 
 3. Make the `fp2lm` programme executable:
@@ -102,6 +127,25 @@ fp2lm -d 20m < ~/Desktop/FlightplannerMission.csv > ~/Desktop/LitchiMission.csv
 
 ### Linux
 
+#### Quick Start (using pre-compiled binary)
+
+1. Download the appropriate package for your system from the [Releases page](https://github.com/pdfinn/flightplan2litchimission/releases):
+   - For x86_64 systems: `fp2lm_linux_amd64.tar.gz`
+   - For ARM64 systems: `fp2lm_linux_arm64.tar.gz`
+
+2. Extract the archive:
+   ```
+   tar -xzf ~/Downloads/fp2lm_linux_*.tar.gz
+   ```
+
+3. Make the binary executable and run it directly:
+   ```
+   chmod +x ./fp2lm
+   ./fp2lm -d 20m < FlightplannerMission.csv > LitchiMission.csv
+   ```
+
+#### Advanced Setup (adding to PATH)
+
 Open the Terminal, and copy the commands below. Change any bracketed `[]` portions to reflect your particular environment.
 
 1. Create a folder named `bin` in your home folder:
@@ -113,7 +157,7 @@ mkdir ~/bin
 2. Move the `fp2lm` binary from the download location to the newly-created `bin` folder:
 
 ```
-mv ~/Downloads/fp2lm ~/bin/fp2lm
+mv ~/Downloads/fp2lm_linux_*/fp2lm ~/bin/fp2lm
 ```
 
 3. Make the `fp2lm` programme executable:
@@ -140,12 +184,18 @@ echo "export PATH=/home/[your home folder]/bin:$PATH" >> ~/.profile
 fp2lm -d 20m < ~/Desktop/FlightplannerMission.csv > ~/Desktop/LitchiMission.csv
 ```
 
-### Windows
+### Windows quick-start (no Go required)
 
-#### Prerequisites
-- Ensure you are using Windows PowerShell, which is Unix/POSIX-compatible, for compatibility with certain command-line operations.
+1. Grab the latest **fp2lm_windows_amd64.zip** from  
+   <https://github.com/pdfinn/flightplan2litchimission/releases>
+2. Un-zip anywhere (e.g. Desktop)
+3. Open *PowerShell* in that folder and run  
 
-#### Step-by-Step Guide
+   ```powershell
+   .\fp2lm.exe -d 20m < FlightplannerMission.csv > LitchiMission.csv
+   ```
+
+For more advanced usage, you may want to add the executable to your PATH:
 
 1. **Create a Bin Directory**
    - Open Windows PowerShell.
@@ -166,17 +216,6 @@ fp2lm -d 20m < ~/Desktop/FlightplannerMission.csv > ~/Desktop/LitchiMission.csv
      $Env:PATH += ";$HOME\bin"
      ```
    - For a permanent change, you will need to add `$HOME\bin` to the PATH environment variable through System Properties or by using the [System Environment Variables](https://docs.microsoft.com/en-us/windows/deployment/usmt/usmt-recognized-environment-variables) settings.
-
-4. **Running fp2lm**
-   - Now you can run `fp2lm` from the command line as described in the usage instructions. For example:
-     ```powershell
-     fp2lm -d 20m < $HOME\Desktop\FlightplannerMission.csv > $HOME\Desktop\LitchiMission.csv
-     ```
-        Alternatively, if you skipped step 3, specify the location of the fp2lm executable explicitly:
-     
-     ```powershell
-     $HOME\bin\fp2lm -d 20m < $HOME\Desktop\FlightplannerMission.csv > $HOME\Desktop\LitchiMission.csv
-     ```
 
 ## Project structure
 
