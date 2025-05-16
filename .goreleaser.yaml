@@ -1,0 +1,35 @@
+project_name: fp2lm    # what the user downloads
+
+# before:
+#   hooks:
+#     - go mod tidy
+
+builds:
+  - id: cli
+    binary: fp2lm
+    main: ./cmd/fp2lm
+    goos:   [windows, linux, darwin]
+    goarch: [amd64, arm64]          # x86_64 + Apple M-series
+    ldflags:
+      - -s -w                      # strip debug for smaller exe
+    env:
+      - CGO_ENABLED=0              # Static binaries that work in containers
+    flags:
+      - -trimpath
+
+archives:
+  - id: zip
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - README.md
+      - LICENSE
+
+checksum:
+  name_template: "{{ .ProjectName }}_checksums.txt"
+
+release:
+  github:
+    draft: true                    # you'll publish after a quick test 
