@@ -48,9 +48,6 @@ jobs:
         go run cmd/fp2lm/main.go -d 10m < fp2lm/testdata/FlightplannerMission.csv > testdata/interval_output.csv
         grep -q 'photo_distinterval,10.0,' testdata/interval_output.csv || (echo "Interval setting failed" && exit 1)
         
-        # Test with max altitude guard
-        go run cmd/fp2lm/main.go -max-altitude=50 < fp2lm/testdata/FlightplannerMission.csv > testdata/altitude_output.csv
-        ! grep -q 'altitude.*100' testdata/altitude_output.csv || (echo "Altitude limit failed" && exit 1)
         
         # Test with output file
         go run cmd/fp2lm/main.go -output=testdata/output_file.csv < fp2lm/testdata/FlightplannerMission.csv

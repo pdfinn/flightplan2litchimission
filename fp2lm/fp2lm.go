@@ -96,9 +96,6 @@ type ConverterOptions struct {
 
 	// GimbalPitch specifies the camera angle in degrees (between -90 and 0)
 	GimbalPitch float64
-
-	// MaxAltitudeAGL specifies the maximum allowed altitude when in AGL mode
-	MaxAltitudeAGL float64
 }
 
 // DefaultOptions returns recommended default options for the converter
@@ -107,19 +104,14 @@ type ConverterOptions struct {
 // - AltitudeMode: "agl" (relative altitudes)
 // - PhotoInterval: 0 (no interval set)
 // - GimbalPitch: -90 degrees (straight down)
-// - MaxAltitudeAGL: 120 meters (common regulatory limit in many jurisdictions)
 //
-// When using AGL mode, the MaxAltitudeAGL setting acts as a safety limit
-// preventing waypoints from being set above the specified height.
-// Default is 120m to comply with regulations in many countries (e.g., FAA, EASA).
-// While DJI drones may allow altitudes up to 500m, users should set this
-// value based on their local regulations and operating permissions.
+// No altitude limits are enforced by default. Pilots must ensure flight plans
+// comply with local regulations and safe operating practices.
 func DefaultOptions() *ConverterOptions {
 	return &ConverterOptions{
-		AltitudeMode:   "agl",
-		PhotoInterval:  0,
-		GimbalPitch:    -90,
-		MaxAltitudeAGL: 120, // Default to 120m for regulations compliance
+		AltitudeMode:  "agl",
+		PhotoInterval: 0,
+		GimbalPitch:   -90,
 	}
 }
 
@@ -226,13 +218,10 @@ func Process(input io.Reader, output io.Writer, options *ConverterOptions) error
 				wp.AltitudeMode = 0 // Switch to absolute mode
 			}
 
-			// For AGL mode, enforce regulatory altitude limits
-			altitude, _, err := ParseField(rec[altitudeIndex], "float64", 0, options.MaxAltitudeAGL)
+			// For AGL mode, accept any positive altitude value
+			altitude, _, err := ParseField(rec[altitudeIndex], "float64", 0, math.MaxFloat64)
 			if err != nil {
-				slog.Error("Altitude exceeds maximum allowed AGL height or is invalid",
-					"error", err,
-					"altitude", rec[altitudeIndex],
-					"maxAllowed", options.MaxAltitudeAGL)
+				slog.Error("Error parsing altitude", "error", err)
 				continue
 			}
 			wp.Point.Altitude = altitude
