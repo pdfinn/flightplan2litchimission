@@ -17,10 +17,9 @@ import (
 func main() {
     // Create converter options
     options := &fp2lm.ConverterOptions{
-        AltitudeMode:   "agl",     // "agl" or "asl"
-        PhotoInterval:  20,        // Distance between photos in meters
-        GimbalPitch:    -90,       // Camera angle in degrees
-        MaxAltitudeAGL: 120,       // Maximum allowed altitude in meters
+        AltitudeMode:  "agl",     // "agl" or "asl"
+        PhotoInterval: 20,        // Distance between photos in meters
+        GimbalPitch:   -90,       // Camera angle in degrees
     }
 
     // Convert from input to output
@@ -44,4 +43,6 @@ The `ConverterOptions` struct configures the conversion behavior:
 - `AltitudeMode`: Determines how altitude values are interpreted. Use "agl" for relative altitudes (Above Ground Level) or "asl" for absolute altitudes (Above Sea Level).
 - `PhotoInterval`: Specifies the distance between photos in meters.
 - `GimbalPitch`: Sets the camera angle in degrees (between -90 and 0).
-- `MaxAltitudeAGL`: Specifies the maximum allowed altitude when in AGL mode, typically set to local regulatory limits. 
+
+No altitude limits are enforced by this package. Pilots must ensure any generated missions comply with local regulations and safety requirements.
+
