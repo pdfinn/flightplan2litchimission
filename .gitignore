@@ -198,3 +198,5 @@ TestFixed.csv
 TestFixedASL.csv
 FinalTest.csv
 *_output.csv
+!cmd/fp2lm/
+!cmd/fp2lm/**

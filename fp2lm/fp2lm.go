@@ -135,7 +135,9 @@ func DefaultOptions() *ConverterOptions {
 //   - Conversion of coordinates and altitude data
 //   - Calculation of bearings between waypoints
 //   - Formatting and output of the Litchi mission
-func Process(input io.Reader, output io.Writer, options *ConverterOptions) error {
+//
+// ConvertWaypoints converts the input CSV into a slice of Litchi waypoints.
+func ConvertWaypoints(input io.Reader, options *ConverterOptions) ([]*missioncsv.LitchiWaypoint, error) {
 	if options == nil {
 		options = DefaultOptions()
 	}
@@ -143,25 +145,16 @@ func Process(input io.Reader, output io.Writer, options *ConverterOptions) error
 	// Validate altitude mode
 	altitudeModeStr := strings.ToLower(options.AltitudeMode)
 	if altitudeModeStr != "asl" && altitudeModeStr != "agl" {
-		return fmt.Errorf("altitude mode must be either 'asl' or 'agl', got %q", options.AltitudeMode)
+		return nil, fmt.Errorf("altitude mode must be either 'asl' or 'agl', got %q", options.AltitudeMode)
 	}
 
 	// Validate pitch value
 	if options.GimbalPitch < -90 || options.GimbalPitch > 0 {
-		return fmt.Errorf("gimbal pitch must be between -90 and 0 degrees, got %.1f", options.GimbalPitch)
+		return nil, fmt.Errorf("gimbal pitch must be between -90 and 0 degrees, got %.1f", options.GimbalPitch)
 	}
 
-	scanner := bufio.NewScanner(input)
-	waypoints := []*missioncsv.LitchiWaypoint{}
-
-	// Create a CSV writer for the output
-	missionWriter := missioncsv.NewWriter(output)
-
-	// Write the Litchi Mission header
-	err := missionWriter.WriteLitchiHeader()
-	if err != nil {
-		return fmt.Errorf("failed to write header: %w", err)
-	}
+       scanner := bufio.NewScanner(input)
+       waypoints := []*missioncsv.LitchiWaypoint{}
 
 	for scanner.Scan() {
 		ln := scanner.Text()
@@ -276,20 +269,29 @@ func Process(input io.Reader, output io.Writer, options *ConverterOptions) error
 		lastWp.Heading = secondLastWp.Heading
 	}
 
-	// Write all waypoints
+	return waypoints, nil
+}
+
+// Process reads Flight Planner CSV data and writes a Litchi CSV to output.
+func Process(input io.Reader, output io.Writer, options *ConverterOptions) error {
+	waypoints, err := ConvertWaypoints(input, options)
+	if err != nil {
+		return err
+	}
+
+	missionWriter := missioncsv.NewWriter(output)
+	if err := missionWriter.WriteLitchiHeader(); err != nil {
+		return fmt.Errorf("failed to write header: %w", err)
+	}
 	for _, wp := range waypoints {
-		err := missionWriter.WriteLitchiWaypoint(wp)
-		if err != nil {
+		if err := missionWriter.WriteLitchiWaypoint(wp); err != nil {
 			return fmt.Errorf("failed to write waypoint: %w", err)
 		}
 	}
-
-	// Flush the writer
 	missionWriter.Flush()
 	if err := missionWriter.Error(); err != nil {
 		return fmt.Errorf("error writing CSV output: %w", err)
 	}
-
 	return nil
 }
 
