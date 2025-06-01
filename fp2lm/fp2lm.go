@@ -163,7 +163,9 @@ func Process(input io.Reader, output io.Writer, options *ConverterOptions) error
 		return fmt.Errorf("failed to write header: %w", err)
 	}
 
+	lineNum := 0
 	for scanner.Scan() {
+		lineNum++
 		ln := scanner.Text()
 		reader := csv.NewReader(strings.NewReader(ln))
 		rec, err := reader.Read()
@@ -177,6 +179,13 @@ func Process(input io.Reader, output io.Writer, options *ConverterOptions) error
 
 		// Skip header line by checking a few key columns rather than all of them
 		if len(rec) >= 3 && (rec[0] == "Waypoint Number" || strings.Contains(rec[0], "Waypoint")) && strings.Contains(rec[1], "X") && strings.Contains(rec[2], "Y") {
+			continue
+		}
+
+		// Validate field count to avoid panics from malformed rows
+		if len(rec) < 7 {
+			slog.Error("Skipping malformed row: expected at least 7 columns",
+				"lineNumber", lineNum, "gotColumns", len(rec), "row", ln)
 			continue
 		}
 

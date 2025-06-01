@@ -269,3 +269,20 @@ func TestDefaultOptions(t *testing.T) {
 		t.Errorf("Expected PhotoInterval to be 0, got %f", float64(options.PhotoInterval))
 	}
 }
+
+// TestProcessWithMissingFields ensures Process gracefully skips rows with too few columns.
+func TestProcessWithMissingFields(t *testing.T) {
+	malformed := "Waypoint Number,X [m],Y [m],Alt. ASL [m],Alt. AGL [m]\n" +
+		"1,0,0,10,5\n" // missing xcoord and ycoord columns
+	var out bytes.Buffer
+	err := fp2lm.Process(strings.NewReader(malformed), &out, fp2lm.DefaultOptions())
+	if err != nil {
+		t.Fatalf("Process returned error: %v", err)
+	}
+
+	// Expect only header line in output
+	lines := strings.Split(strings.TrimSpace(out.String()), "\n")
+	if len(lines) != 1 {
+		t.Errorf("expected only header line, got %d lines", len(lines))
+	}
+}
