@@ -44,4 +44,6 @@ The `ConverterOptions` struct configures the conversion behavior:
 - `AltitudeMode`: Determines how altitude values are interpreted. Use "agl" for relative altitudes (Above Ground Level) or "asl" for absolute altitudes (Above Sea Level).
 - `PhotoInterval`: Specifies the distance between photos in meters.
 - `GimbalPitch`: Sets the camera angle in degrees (between -90 and 0).
-- `MaxAltitudeAGL`: Specifies the maximum allowed altitude when in AGL mode, typically set to local regulatory limits. 
+- `MaxAltitudeAGL`: Specifies the maximum allowed altitude when in AGL mode, typically set to local regulatory limits.
+
+By default, `fp2lm` adds a "take photo" action at each waypoint so every point along the mission captures an image, even when using distance-based intervals.
