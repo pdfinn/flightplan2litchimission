@@ -14,6 +14,7 @@ fp2lm [options] < FlightplannerMission.csv > LitchiMission.csv
 - `-pitch <angle>`: Gimbal pitch angle (-90 to 0 degrees). Default: `-90`
 - `-max-altitude <meters>`: Maximum allowed altitude AGL in meters. Default: `120` (to comply with regulations)
 - `-output <path>`: Output file path (if not specified, writes to stdout)
+- `-format <csv|kml|kmz>`: Output format. Default `csv`. Use `kml` for Google Earth files or `kmz` for compressed output.
 
 ## Description
 
@@ -81,8 +82,11 @@ Alternatively, you can build from source by following the instructions below.
 
 3. Make the binary executable and run it directly:
    ```
-   chmod +x ./fp2lm
-   ./fp2lm -d 20m < FlightplannerMission.csv > LitchiMission.csv
+chmod +x ./fp2lm
+./fp2lm -d 20m < FlightplannerMission.csv > LitchiMission.csv
+
+# Generate KML instead of CSV
+./fp2lm -format=kml -d 20m < FlightplannerMission.csv > mission.kml
    ```
 
 #### Advanced Setup (adding to PATH)
