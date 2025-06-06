@@ -21,8 +21,11 @@ jobs:
     - name: Verify dependencies
       run: go mod verify
 
-    - name: Run all checks (via Makefile)
-      run: make check
+    - name: Run tests
+      run: make test
+      
+    - name: Run vet
+      run: make vet
 
     - name: Test Golden Files
       run: |
