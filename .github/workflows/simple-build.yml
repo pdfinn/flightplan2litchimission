@@ -1,0 +1,57 @@
+name: simple-build-release
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-go@v4
+        with:
+          go-version: "1.22"
+      
+      - name: Add module dependencies
+        run: |
+          go get github.com/stretchr/testify
+          go mod tidy
+      
+      - name: Build executables
+        run: |
+          echo "Building Windows executable..."
+          GOOS=windows GOARCH=amd64 go build -o fp2lm.exe ./cmd/fp2lm
+          echo "Building macOS executable..."
+          GOOS=darwin GOARCH=amd64 go build -o fp2lm_mac ./cmd/fp2lm
+          echo "Building Linux executable..."
+          GOOS=linux GOARCH=amd64 go build -o fp2lm_linux ./cmd/fp2lm
+          
+          # Verify the binaries were created
+          ls -la fp2lm*
+      
+      - name: Package executables
+        run: |
+          mkdir -p release
+          # Windows
+          zip -j release/fp2lm_windows_amd64.zip fp2lm.exe README.md LICENSE
+          # macOS
+          tar -czf release/fp2lm_darwin_amd64.tar.gz fp2lm_mac README.md LICENSE
+          # Linux
+          tar -czf release/fp2lm_linux_amd64.tar.gz fp2lm_linux README.md LICENSE
+          
+          # Verify packages
+          ls -la release/
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ github.ref_name }}
+          files: |
+            release/fp2lm_windows_amd64.zip
+            release/fp2lm_darwin_amd64.tar.gz
+            release/fp2lm_linux_amd64.tar.gz 
