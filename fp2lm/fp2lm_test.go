@@ -49,9 +49,8 @@ func TestProcess(t *testing.T) {
 
 	// Create options
 	options := &fp2lm.ConverterOptions{
-		AltitudeMode:   "agl",
-		GimbalPitch:    -90,
-		MaxAltitudeAGL: 120,
+		AltitudeMode: "agl",
+		GimbalPitch:  -90,
 	}
 
 	// Process the input using the exported Process function
@@ -99,9 +98,8 @@ func TestCSVRoundTrip(t *testing.T) {
 	var firstOutput bytes.Buffer
 
 	options := &fp2lm.ConverterOptions{
-		AltitudeMode:   "agl",
-		GimbalPitch:    -90,
-		MaxAltitudeAGL: 120,
+		AltitudeMode: "agl",
+		GimbalPitch:  -90,
 	}
 
 	err := fp2lm.Process(inputReader, &firstOutput, options)
@@ -259,10 +257,6 @@ func TestDefaultOptions(t *testing.T) {
 
 	if options.GimbalPitch != -90 {
 		t.Errorf("Expected GimbalPitch to be -90, got %f", options.GimbalPitch)
-	}
-
-	if options.MaxAltitudeAGL != 120 {
-		t.Errorf("Expected MaxAltitudeAGL to be 120, got %f", options.MaxAltitudeAGL)
 	}
 
 	if float64(options.PhotoInterval) != 0 {

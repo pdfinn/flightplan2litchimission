@@ -96,9 +96,6 @@ type ConverterOptions struct {
 
 	// GimbalPitch specifies the camera angle in degrees (between -90 and 0)
 	GimbalPitch float64
-
-	// MaxAltitudeAGL specifies the maximum allowed altitude when in AGL mode
-	MaxAltitudeAGL float64
 }
 
 // DefaultOptions returns recommended default options for the converter
@@ -107,19 +104,14 @@ type ConverterOptions struct {
 // - AltitudeMode: "agl" (relative altitudes)
 // - PhotoInterval: 0 (no interval set)
 // - GimbalPitch: -90 degrees (straight down)
-// - MaxAltitudeAGL: 120 meters (common regulatory limit in many jurisdictions)
 //
-// When using AGL mode, the MaxAltitudeAGL setting acts as a safety limit
-// preventing waypoints from being set above the specified height.
-// Default is 120m to comply with regulations in many countries (e.g., FAA, EASA).
-// While DJI drones may allow altitudes up to 500m, users should set this
-// value based on their local regulations and operating permissions.
+// Note: No altitude safety limits are enforced - pilots are responsible
+// for ensuring compliance with local regulations and safe operating practices.
 func DefaultOptions() *ConverterOptions {
 	return &ConverterOptions{
-		AltitudeMode:   "agl",
-		PhotoInterval:  0,
-		GimbalPitch:    -90,
-		MaxAltitudeAGL: 120, // Default to 120m for regulations compliance
+		AltitudeMode:  "agl",
+		PhotoInterval: 0,
+		GimbalPitch:   -90,
 	}
 }
 
@@ -234,26 +226,15 @@ func Process(input io.Reader, output io.Writer, options *ConverterOptions) error
 				altitudeIndex = 3
 				wp.AltitudeMode = 0 // Switch to absolute mode
 			}
-
-			// For AGL mode, enforce regulatory altitude limits
-			altitude, _, err := ParseField(rec[altitudeIndex], "float64", 0, options.MaxAltitudeAGL)
-			if err != nil {
-				slog.Error("Altitude exceeds maximum allowed AGL height or is invalid",
-					"error", err,
-					"altitude", rec[altitudeIndex],
-					"maxAllowed", options.MaxAltitudeAGL)
-				continue
-			}
-			wp.Point.Altitude = altitude
-		} else {
-			// For ASL mode, still validate reasonable values but allow higher altitudes
-			altitude, _, err := ParseField(rec[altitudeIndex], "float64", 0, math.MaxFloat64)
-			if err != nil {
-				slog.Error("Error parsing altitude", "error", err, "altitudeMode", options.AltitudeMode)
-				continue
-			}
-			wp.Point.Altitude = altitude
 		}
+
+		// Parse altitude - pilot is responsible for altitude safety decisions
+		altitude, err := strconv.ParseFloat(rec[altitudeIndex], 64)
+		if err != nil {
+			slog.Error("Error parsing altitude", "error", err, "altitudeMode", options.AltitudeMode)
+			continue
+		}
+		wp.Point.Altitude = altitude
 
 		// Add a default photo action
 		wp.Actions = []missioncsv.Action{
