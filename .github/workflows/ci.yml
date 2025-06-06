@@ -31,7 +31,7 @@ jobs:
       run: |
         mkdir -p testdata
         cp fp2lm/testdata/litchi_golden.csv testdata/litchi_golden_original.csv
-        go run cmd/fp2lm/main.go < fp2lm/testdata/FlightplannerMission.csv > testdata/litchi_generated.csv
+        go run ./cmd/fp2lm < fp2lm/testdata/FlightplannerMission.csv > testdata/litchi_generated.csv
         if ! diff -u fp2lm/testdata/litchi_golden.csv testdata/litchi_generated.csv; then
           echo "Golden file does not match generated output"
           exit 1
@@ -40,32 +40,32 @@ jobs:
     - name: Test flag-driven behavior
       run: |
         # Test with ASL altitude mode
-        go run cmd/fp2lm/main.go -altitude-mode=asl < fp2lm/testdata/FlightplannerMission.csv > testdata/asl_output.csv
+        go run ./cmd/fp2lm -altitude-mode=asl < fp2lm/testdata/FlightplannerMission.csv > testdata/asl_output.csv
         grep -q 'altitudemode,0,' testdata/asl_output.csv || (echo "ASL mode failed" && exit 1)
         
         # Test with different pitch
-        go run cmd/fp2lm/main.go -pitch=-80 < fp2lm/testdata/FlightplannerMission.csv > testdata/pitch_output.csv
+        go run ./cmd/fp2lm -pitch=-80 < fp2lm/testdata/FlightplannerMission.csv > testdata/pitch_output.csv
         grep -q 'gimbalpitchangle,-80.0,' testdata/pitch_output.csv || (echo "Pitch setting failed" && exit 1)
         
         # Test with interval
-        go run cmd/fp2lm/main.go -d 10m < fp2lm/testdata/FlightplannerMission.csv > testdata/interval_output.csv
+        go run ./cmd/fp2lm -d 10m < fp2lm/testdata/FlightplannerMission.csv > testdata/interval_output.csv
         grep -q 'photo_distinterval,10.0,' testdata/interval_output.csv || (echo "Interval setting failed" && exit 1)
         
         # Test with ASL mode to verify altitude processing
-        go run cmd/fp2lm/main.go -altitude-mode=asl < fp2lm/testdata/FlightplannerMission.csv > testdata/altitude_output.csv
+        go run ./cmd/fp2lm -altitude-mode=asl < fp2lm/testdata/FlightplannerMission.csv > testdata/altitude_output.csv
         grep -q 'altitudemode,0,' testdata/altitude_output.csv || (echo "ASL altitude mode failed" && exit 1)
         
         # Test with output file
-        go run cmd/fp2lm/main.go -output=testdata/output_file.csv < fp2lm/testdata/FlightplannerMission.csv
+        go run ./cmd/fp2lm -output=testdata/output_file.csv < fp2lm/testdata/FlightplannerMission.csv
         [ -f testdata/output_file.csv ] || (echo "Output file not created" && exit 1)
         
     - name: Test CSV round-trip conversion
       run: |
         # Generate a Litchi CSV with AGL mode
-        go run cmd/fp2lm/main.go < fp2lm/testdata/FlightplannerMission.csv > testdata/first_pass.csv
+        go run ./cmd/fp2lm < fp2lm/testdata/FlightplannerMission.csv > testdata/first_pass.csv
         
         # Feed that CSV back in with ASL mode
-        go run cmd/fp2lm/main.go -altitude-mode=asl < testdata/first_pass.csv > testdata/second_pass.csv
+        go run ./cmd/fp2lm -altitude-mode=asl < testdata/first_pass.csv > testdata/second_pass.csv
         
         # Create a verification script
         cat > verify.py << 'EOF'
